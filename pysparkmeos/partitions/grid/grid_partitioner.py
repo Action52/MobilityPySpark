@@ -4,39 +4,94 @@ from pymeos import TPoint, STBox
 from pymeos import STBox, pymeos_initialize, pymeos_finalize, TGeogPointInst
 from pymeos_cffi.functions import stbox_tile_list
 import logging
-from typing import Tuple
+from typing import Tuple, Any, Callable
 
-from pysparkmeos.partitions.partition import MobilityPartition
+from pysparkmeos.partitions.mobilityrdd import MobilityPartitioner
 import numpy as np
 from shapely.geometry import Point
 
+from pyspark.sql.functions import udf
 
-class GridPartition(MobilityPartition):
+
+class GridPartition(MobilityPartitioner):
     def __init__(self, cells_per_side: int, bounds: STBox):
-        self.bounds = bounds
-        self.grid = self._generate_grid(bounds, cells_per_side)
-        self.gridstr = [str(tile) for tile in self.grid]
-        self.total_partitions = len(self.grid)
+        grid = self._generate_grid(bounds, cells_per_side)
+        self.gridstr = [str(tile) for tile in grid]
+        self.total_partitions = len(grid)
+        super().__init__(self.total_partitions, self.get_partition)
 
     @staticmethod
-    def _generate_grid2(bounds: STBox, n_cells):
-        xtilesize = (bounds.xmax() - bounds.xmin()) / (n_cells + 1)
-        xstart = bounds.xmin()
-        xtilebounds = [()]
-
-        ytilesize = (bounds.ymax() - bounds.ymin()) / (n_cells + 1)
-        ystart = bounds.ymin()
-
-        ztilesize = (bounds.zmax() - bounds.zmin()) / (n_cells + 1) if bounds.has_z() else None
-        zstart = bounds.zmin() if bounds.has_z() else None
-
-        ttilesize = bounds.to_tstzspan().duration() / (n_cells + 1) if bounds.has_t() else None
-        tstart = bounds.tmin() if bounds.has_t() else None
-
-
+    def _generate_grid(bounds: STBox, n_cells):
+        xtilesize = (bounds.xmax() - bounds.xmin()) / (n_cells)
+        xact = bounds.xmin()
         xtilebounds = []
+        for n in range(n_cells):
+            xtilebounds.append((xact, xact+xtilesize))
+            xact+=xtilesize
+
+        ytilesize = (bounds.ymax() - bounds.ymin()) / (n_cells)
+        yact = bounds.ymin()
+        ytilebounds = []
+        for n in range(n_cells):
+            ytilebounds.append((yact, yact+ytilesize))
+            yact+=ytilesize
+
+        ztilesize = (bounds.zmax() - bounds.zmin()) / (n_cells) if bounds.has_z() else None
+        zact = bounds.zmin() if bounds.has_z() else None
+        ztilebounds = [] if bounds.has_z() else None
+        if bounds.has_z():
+            for n in range(n_cells):
+                ztilebounds.append((zact, zact+ztilesize))
+                zact+=ztilesize
+
+        ttilesize = bounds.to_tstzspan().duration() / (n_cells) if bounds.has_t() else None
+        tact = bounds.tmin() if bounds.has_t() else None
+        ttilebounds = [] if bounds.has_t() else None
+        if bounds.has_t():
+            for n in range(n_cells):
+                ttilebounds.append((tact, tact+ttilesize))
+                tact+=ttilesize
+
+        tiles = None
+        if bounds.has_t() and bounds.has_z():
+            tiles = [
+                STBox(
+                    xmin=xi[0],
+                    xmax=xi[1],
+                    ymin=yi[0],
+                    ymax=yi[1],
+                    zmin=zi[0],
+                    zmax=zi[1],
+                    tmin=ti[0],
+                    tmax=ti[1])
+                for xi in xtilebounds for yi in ytilebounds for ti in ttilebounds for zi in ztilebounds
+            ]
+        if bounds.has_t() and not bounds.has_z():
+            tiles = [
+                STBox(
+                    xmin=xi[0],
+                    xmax=xi[1],
+                    ymin=yi[0],
+                    ymax=yi[1],
+                    tmin=ti[0],
+                    tmax=ti[1])
+                for xi in xtilebounds for yi in ytilebounds for ti in ttilebounds
+            ]
+        if bounds.has_z() and not bounds.has_t():
+            tiles = [
+                STBox(
+                    xmin=xi[0],
+                    xmax=xi[1],
+                    ymin=yi[0],
+                    ymax=yi[1],
+                    zmin=zi[0],
+                    zmax=zi[1])
+                for xi in xtilebounds for yi in ytilebounds for zi in ztilebounds
+            ]
+        return tiles
+
     @staticmethod
-    def _generate_grid(bounds, n_cells):
+    def _generate_grid2(bounds, n_cells):
         xinc = (bounds.xmax() - bounds.xmin()) / n_cells + 1
         xstart = bounds.xmin() - 1
         xint = [(x, x + xinc) for x in
@@ -100,10 +155,15 @@ class GridPartition(MobilityPartition):
         return tiles
 
     @staticmethod
-    def get_partition(value: Tuple, utc_time="UTC", **kwargs) -> int:
-        logging.debug(value)
-        key, point, grid = value
-        point = TGeogPointInst(point)
+    def get_partition(
+            point: Any,
+            grid: list,
+            utc_time: str = "UTC",
+            **kwargs
+    ) -> int:
+        pymeos_initialize()
+        if type(point) == str:
+            point = TGeogPointInst(point)
         # Little tweak to avoid pymeos bug
         point = point.set_srid(0)
         point = STBox(point.bounding_box().__str__().strip("GEOD"))
@@ -111,10 +171,10 @@ class GridPartition(MobilityPartition):
             stbox: STBox = STBox(partition).set_srid(0)
             if point.is_contained_in(stbox):
                 return idx
-        return 1  # Return a special index if no suitable partition is found
+        return -1
 
     def num_partitions(self) -> int:
-        return self.total_partitions
+        return self.numPartitions
 
 
 def main():
@@ -139,9 +199,10 @@ def main():
     for tile in gp.gridstr:
         print(tile)
     print("***************************")
-    print(gp.get_partition((tpoint.__str__(), tpoint.__str__(), gp.gridstr)))
+    print(gp.get_partition(tpoint, gp.gridstr))
+    # gp.grid[0].plot_xt()
 
-    gp.grid[0].plot_xt()
+    tpoint.values()
 
     pymeos_finalize()
 

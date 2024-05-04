@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Any
+
 from pyspark import RDD
 
 class MobilityPartition(ABC):
@@ -9,6 +11,6 @@ class MobilityPartition(ABC):
         pass
 
     @abstractmethod
-    def get_partition(self, key, utc_time="UTC", **kwargs) -> int:
+    def get_partition(self, key: int, data: Any, utc_time="UTC", **kwargs) -> int:
         """Return the partition index for the given key. Pass any kwargs as needed. """
         pass
