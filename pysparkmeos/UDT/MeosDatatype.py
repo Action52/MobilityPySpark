@@ -59,87 +59,85 @@ WRAPPERS
 #########################
 """
 
+class MeosWrap:  
+    def __setstate__(self, state):
+        pymeos_initialize()
+        #print("Im being unpickled: ", state)
+        self._inner = self(state)._inner
+
+    def __getstate__(self):
+        pymeos_initialize()
+        #print("Im being pickled: ", self.__str__())
+        stringrepr = self.__str__()
+        del self._inner
+        return stringrepr
+
+
 class TGeogPointInstWrap(TGeogPointInst):
     def __setstate__(self, state):
         pymeos_initialize()
-        # print("Im being unpickled: ", state)
+        #print("Im being unpickled: ", state)
         self._inner = TGeogPointInst(state)._inner
 
     def __getstate__(self):
         pymeos_initialize()
-        # print("Im being pickled: ", self.__str__())
-        return self.__str__()
+        #print("Im being pickled: ", self.__str__())
+        stringrepr = self.__str__()
+        del self._inner
+        return stringrepr
+
 
 class STBoxWrap(STBox):
     def __setstate__(self, state):
         pymeos_initialize()
-        # print("Im being unpickled: ", state)
+        #print("Im being unpickled: ", state)
         self._inner = STBox(state)._inner
 
     def __getstate__(self):
         pymeos_initialize()
-        # print("Im being pickled: ", self.__str__())
-        return self.__str__()
+        #print("Im being pickled: ", self.__str__())
+        stringrepr = self.__str__()
+        del self._inner
+        return stringrepr
 
 
 class TGeogPointSeqSetWrap(TGeogPointSeqSet):
     def __setstate__(self, state):
         pymeos_initialize()
-        # print("Im being unpickled: ", state)
+        #print("Im being unpickled: ", state)
         self._inner = TGeogPointSeqSet(state)._inner
 
     def __getstate__(self):
         pymeos_initialize()
-        # print("Im being pickled: ", self.__str__())
-        return self.__str__()
+        #print("Im being pickled: ", self.__str__())
+        stringrepr = self.__str__()
+        del self._inner
+        return stringrepr
 
 
 class TGeogPointSeqWrap(TGeogPointSeq):
     def __setstate__(self, state):
         pymeos_initialize()
-        # print("Im being unpickled: ", state)
+        #print("Im being unpickled: ", state)
         self._inner = TGeogPointSeq(state)._inner
 
     def __getstate__(self):
         pymeos_initialize()
-        # print("Im being pickled: ", self.__str__())
-        return self.__str__()
+        #print("Im being pickled: ", self.__str__())
+        stringrepr = self.__str__()
+        del self._inner
+        return stringrepr
+
+class TGeomPointInstWrap(TGeomPointInst, MeosWrap):
+    pass
 
 
-class TGeomPointInstWrap(TGeomPointInst):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        # print("Im being unpickled: ", state)
-        self._inner = TGeomPointInst(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        # print("Im being pickled: ", self.__str__())
-        return self.__str__()
+class TGeomPointSeqWrap(TGeomPointSeq, MeosWrap):
+    pass
 
 
-class TGeomPointSeqWrap(TGeomPointSeq):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        # print("Im being unpickled: ", state)
-        self._inner = TGeomPointSeq(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        # print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-class TGeomPointSeqSetWrap(TGeomPointSeqSet):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        # print("Im being unpickled: ", state)
-        self._inner = TGeomPointSeqSet(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        # print("Im being pickled: ", self.__str__())
-        return self.__str__()
+class TGeomPointSeqSetWrap(TGeomPointSeqSet, MeosWrap):
+    pass
 
 
 """
@@ -162,7 +160,7 @@ class TGeomPointInstUDT(MeosDatatypeUDT[TGeomPointInstWrap]):
 
     def from_string(self, datum: str) -> TGeomPointInstWrap:
         return TGeomPointInstWrap(datum)
-        
+
 
 class TGeomPointSeqUDT(MeosDatatypeUDT[TGeomPointSeqWrap]):
     def simpleString(self) -> str:
@@ -178,7 +176,7 @@ class TGeomPointSeqSetUDT(MeosDatatypeUDT[TGeomPointSeqSetWrap]):
 
     def from_string(self, datum: str) -> TGeomPointSeqSetWrap:
         return TGeomPointSeqSetWrap(datum)
-
+        
 
 class TFloatInstUDT(MeosDatatypeUDT[TFloatInst]):
     def simpleString(self) -> str:
@@ -188,12 +186,12 @@ class TFloatInstUDT(MeosDatatypeUDT[TFloatInst]):
         return TFloatInst(datum)
 
 
-class STBoxUDT(MeosDatatypeUDT[STBox]):
+class STBoxUDT(MeosDatatypeUDT[STBoxWrap]):
     def simpleString(self) -> str:
         return "stbox"
         
-    def from_string(self, datum: str) -> STBox:
-        return STBox(datum)
+    def from_string(self, datum: str) -> STBoxWrap:
+        return STBoxWrap(datum)
 
 
 class TsTzSpanUDT(MeosDatatypeUDT[TsTzSpan]):
@@ -210,6 +208,7 @@ class TGeogPointSeqUDT(MeosDatatypeUDT[TGeogPointSeqWrap]):
 
     def from_string(self, datum: str) -> TGeogPointSeqWrap:
         return TGeogPointSeqWrap(datum)
+
 
 class TGeogPointSeqSetUDT(MeosDatatypeUDT[TGeogPointSeqSetWrap]):
     def simpleString(self) -> str:

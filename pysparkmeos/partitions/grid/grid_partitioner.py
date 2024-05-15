@@ -9,8 +9,9 @@ from typing import Tuple, Any, Callable
 from pysparkmeos.partitions.mobilityrdd import MobilityPartitioner
 import numpy as np
 from shapely.geometry import Point
-
-from pyspark.sql.functions import udf
+from pysparkmeos.UDT.MeosDatatype import *
+from pyspark.sql.functions import udf, udtf, lit
+from pyspark.sql.types import *
 
 
 class GridPartition(MobilityPartitioner):
@@ -20,8 +21,12 @@ class GridPartition(MobilityPartitioner):
         self.total_partitions = len(grid)
         super().__init__(self.total_partitions, self.get_partition)
 
+    def as_spark_table(self):
+        gridstr = self.gridstr  # Do this so that spark doesn't break
+        return GridSparkCreator(lit(gridstr))
+
     @staticmethod
-    def _generate_grid(bounds: STBox, n_cells):
+    def _generate_grid(bounds: STBox, n_cells, geodetic=True):
         xtilesize = (bounds.xmax() - bounds.xmin()) / (n_cells)
         xact = bounds.xmin()
         xtilebounds = []
@@ -63,7 +68,9 @@ class GridPartition(MobilityPartitioner):
                     zmin=zi[0],
                     zmax=zi[1],
                     tmin=ti[0],
-                    tmax=ti[1])
+                    tmax=ti[1],
+                    geodetic=geodetic
+                )
                 for xi in xtilebounds for yi in ytilebounds for ti in ttilebounds for zi in ztilebounds
             ]
         if bounds.has_t() and not bounds.has_z():
@@ -74,7 +81,9 @@ class GridPartition(MobilityPartitioner):
                     ymin=yi[0],
                     ymax=yi[1],
                     tmin=ti[0],
-                    tmax=ti[1])
+                    tmax=ti[1],
+                    geodetic=geodetic
+                )
                 for xi in xtilebounds for yi in ytilebounds for ti in ttilebounds
             ]
         if bounds.has_z() and not bounds.has_t():
@@ -85,13 +94,15 @@ class GridPartition(MobilityPartitioner):
                     ymin=yi[0],
                     ymax=yi[1],
                     zmin=zi[0],
-                    zmax=zi[1])
+                    zmax=zi[1],
+                    geodetic=geodetic
+                )
                 for xi in xtilebounds for yi in ytilebounds for zi in ztilebounds
             ]
         return tiles
 
     @staticmethod
-    def _generate_grid2(bounds, n_cells):
+    def _generate_grid2(bounds, n_cells, geodetic=True):
         xinc = (bounds.xmax() - bounds.xmin()) / n_cells + 1
         xstart = bounds.xmin() - 1
         xint = [(x, x + xinc) for x in
@@ -127,7 +138,9 @@ class GridPartition(MobilityPartitioner):
                     zmin=zi[0],
                     zmax=zi[1],
                     tmin=ti[0],
-                    tmax=ti[1])
+                    tmax=ti[1],
+                    geodetic=geodetic
+                )
                 for xi in xint for yi in yint for ti in tint for zi in zint
             ]
         if bounds.has_t() and not bounds.has_z():
@@ -138,7 +151,9 @@ class GridPartition(MobilityPartitioner):
                     ymin=yi[0],
                     ymax=yi[1],
                     tmin=ti[0],
-                    tmax=ti[1])
+                    tmax=ti[1],
+                    geodetic=geodetic
+                )
                 for xi in xint for yi in yint for ti in tint
             ]
         if bounds.has_z() and not bounds.has_t():
@@ -149,7 +164,9 @@ class GridPartition(MobilityPartitioner):
                     ymin=yi[0],
                     ymax=yi[1],
                     zmin=zi[0],
-                    zmax=zi[1])
+                    zmax=zi[1],
+                    geodetic=geodetic
+                )
                 for xi in xint for yi in yint for zi in zint
             ]
         return tiles
@@ -175,6 +192,17 @@ class GridPartition(MobilityPartitioner):
 
     def num_partitions(self) -> int:
         return self.numPartitions
+
+
+@udtf(returnType=StructType([
+    StructField("tileid", IntegerType()),
+    StructField("tile", STBoxUDT())
+]))
+class GridSparkCreator:
+    def eval(self, gridstr):
+        pymeos_initialize()
+        for tileid, tile in enumerate(gridstr):
+            yield tileid, STBox(tile)
 
 
 def main():
