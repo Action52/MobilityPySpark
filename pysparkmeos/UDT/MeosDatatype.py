@@ -68,9 +68,7 @@ class MeosWrap:
     def __getstate__(self):
         pymeos_initialize()
         #print("Im being pickled: ", self.__str__())
-        stringrepr = self.__str__()
-        del self._inner
-        return stringrepr
+        return self.__str__()
 
 
 class TGeogPointInstWrap(TGeogPointInst):
@@ -82,9 +80,7 @@ class TGeogPointInstWrap(TGeogPointInst):
     def __getstate__(self):
         pymeos_initialize()
         #print("Im being pickled: ", self.__str__())
-        stringrepr = self.__str__()
-        del self._inner
-        return stringrepr
+        return self.__str__()
 
 
 class STBoxWrap(STBox):
@@ -96,9 +92,7 @@ class STBoxWrap(STBox):
     def __getstate__(self):
         pymeos_initialize()
         #print("Im being pickled: ", self.__str__())
-        stringrepr = self.__str__()
-        del self._inner
-        return stringrepr
+        return self.__str__()
 
 
 class TGeogPointSeqSetWrap(TGeogPointSeqSet):
@@ -110,9 +104,8 @@ class TGeogPointSeqSetWrap(TGeogPointSeqSet):
     def __getstate__(self):
         pymeos_initialize()
         #print("Im being pickled: ", self.__str__())
-        stringrepr = self.__str__()
-        del self._inner
-        return stringrepr
+        return self.__str__()
+
 
 
 class TGeogPointSeqWrap(TGeogPointSeq):
@@ -124,9 +117,7 @@ class TGeogPointSeqWrap(TGeogPointSeq):
     def __getstate__(self):
         pymeos_initialize()
         #print("Im being pickled: ", self.__str__())
-        stringrepr = self.__str__()
-        del self._inner
-        return stringrepr
+        return self.__str__()
 
 class TGeomPointInstWrap(TGeomPointInst, MeosWrap):
     pass
