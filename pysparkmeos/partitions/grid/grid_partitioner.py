@@ -15,8 +15,8 @@ from pyspark.sql.types import *
 
 
 class GridPartition(MobilityPartitioner):
-    def __init__(self, cells_per_side: int, bounds: STBox):
-        grid = self._generate_grid(bounds, cells_per_side)
+    def __init__(self, cells_per_side: int, bounds: STBox, geodetic=False):
+        grid = [tile.set_srid(0) for tile in self._generate_grid(bounds, cells_per_side, geodetic=geodetic)]
         self.gridstr = [str(tile) for tile in grid]
         self.total_partitions = len(grid)
         super().__init__(self.total_partitions, self.get_partition)

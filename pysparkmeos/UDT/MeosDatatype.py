@@ -119,16 +119,40 @@ class TGeogPointSeqWrap(TGeogPointSeq):
         #print("Im being pickled: ", self.__str__())
         return self.__str__()
 
-class TGeomPointInstWrap(TGeomPointInst, MeosWrap):
-    pass
+class TGeomPointInstWrap(TGeomPointInst):
+    def __setstate__(self, state):
+        pymeos_initialize()
+        #print("Im being unpickled: ", state)
+        self._inner = TGeomPointInst(state)._inner
+
+    def __getstate__(self):
+        pymeos_initialize()
+        #print("Im being pickled: ", self.__str__())
+        return self.__str__()
 
 
-class TGeomPointSeqWrap(TGeomPointSeq, MeosWrap):
-    pass
+class TGeomPointSeqWrap(TGeomPointSeq):
+    def __setstate__(self, state):
+        pymeos_initialize()
+        #print("Im being unpickled: ", state)
+        self._inner = TGeomPointSeq(state)._inner
+
+    def __getstate__(self):
+        pymeos_initialize()
+        #print("Im being pickled: ", self.__str__())
+        return self.__str__()
 
 
-class TGeomPointSeqSetWrap(TGeomPointSeqSet, MeosWrap):
-    pass
+class TGeomPointSeqSetWrap(TGeomPointSeqSet):
+    def __setstate__(self, state):
+        pymeos_initialize()
+        #print("Im being unpickled: ", state)
+        self._inner = TGeomPointSeqSet(state)._inner
+
+    def __getstate__(self):
+        pymeos_initialize()
+        #print("Im being pickled: ", self.__str__())
+        return self.__str__()
 
 
 """

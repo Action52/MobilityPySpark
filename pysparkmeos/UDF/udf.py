@@ -10,10 +10,10 @@ from datetime import datetime
 from shapely import wkb, box, from_wkb
 
 # Define the UDF for creating a TGeogPointInst
-@F.udf(returnType=TGeogPointInstUDT())
+@F.udf(returnType=TGeomPointInstUDT())
 def create_point_udf(lat, lon, time):
     pymeos_initialize("UTC")
-    point_inst = TGeogPointInst(f"Point({lon} {lat})@{str(time)}")
+    point_inst = TGeomPointInst(f"Point({lon} {lat})@{str(time)}")
     point_inst_str = point_inst.__str__()
     # print(point_inst)
     #pymeos_finalize()
