@@ -81,12 +81,19 @@ def geometry_from_hexwkb(geom):
 @F.udf(returnType=TGeomPointSeqUDT())
 def trip_from_hexwkb(trip: StringType()):
     pymeos_initialize()
+    # Tweak to avoid MEOS bug, should be fixed once PyMEOS is updated.
+    #tseq = TGeogPointSeq(trip)
     return TGeomPointSeq(trip)
-
+    #return TGeogPointSeq.from_hexwkb(trip)
+    
 @F.udf(returnType=GeometryUDT())
 def tpoint_at(trip: TGeomPointSeq, instant):
     pymeos_initialize()
-    return trip.at(instant).start_value()
+    tripat = trip.at(instant)
+    if tripat:
+        return tripat.start_value()
+    else:
+        return tripat
 
 @F.udf(returnType=BooleanType())
 def temporally_contains(trip, instant):
