@@ -92,8 +92,6 @@ def tpoint_at(trip: TGeomPointSeq, instant):
     tripat = trip.at(instant)
     if tripat:
         return tripat.start_value()
-    else:
-        return tripat
 
 @F.udf(returnType=BooleanType())
 def temporally_contains(trip, instant):

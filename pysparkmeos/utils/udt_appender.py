@@ -19,6 +19,8 @@ def udt_append():
     TGeomPointInst.__UDT__ = TGeomPointInstUDT()
     TGeomPointSeq.__UDT__ = TGeomPointSeqUDT()
     TGeomPointSeqSet.__UDT__ = TGeomPointSeqSetUDT()
+
+    TBoolInst.__UDT__ = TBoolInstUDT()
     
     Point.__UDT__ = GeometryUDT()
     Polygon.__UDT__ = GeometryUDT()

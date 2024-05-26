@@ -155,6 +155,17 @@ class TGeomPointSeqSetWrap(TGeomPointSeqSet):
         return self.__str__()
 
 
+class TBoolInstWrap(TBoolInst):
+    def __setstate__(self, state):
+        pymeos_initialize()
+        #print("Im being unpickled: ", state)
+        self._inner = TBoolInst(state)._inner
+
+    def __getstate__(self):
+        pymeos_initialize()
+        #print("Im being pickled: ", self.__str__())
+        return self.__str__()
+
 """
 #########################
 UDTs
@@ -231,6 +242,14 @@ class TGeogPointSeqSetUDT(MeosDatatypeUDT[TGeogPointSeqSetWrap]):
 
     def from_string(self, datum: str) -> TGeogPointSeqSetWrap:
         return TGeogPointSeqSetWrap(datum)
+
+
+class TBoolInstUDT(MeosDatatypeUDT[TBoolInstWrap]):
+    def simpleString(self) -> str:
+        return "tinstant"
+
+    def from_string(self, datum: str) -> TBoolInstWrap:
+        return TBoolInstWrap(datum)
 
 
 class GeometryUDT(UserDefinedType):
