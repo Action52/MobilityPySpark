@@ -1,122 +1,305 @@
-from abc import abstractmethod
-from collections import defaultdict
-from typing import Any, Callable, Optional, Iterable, Tuple
+from abc import abstractmethod, ABC
 
-from pyspark.rdd import RDD, Partitioner, portable_hash, K, V
-from pyspark.serializers import pack_long, BatchedSerializer
-from pyspark.shuffle import get_used_memory
-from pyspark.traceback_utils import SCCallSiteSync
+from pyspark.rdd import Partitioner
+import pyspark.sql.functions as F
+from pyspark.sql.types import *
 
-from pyspark.sql import DataFrame
+from pymeos import *
+from typing import *
+
+from pysparkmeos.UDT.MeosDatatype import *
+
+from shapely import Geometry
+
 
 class MobilityPartitioner(Partitioner):
-    """
-    Abstract method to define a partition strategy. Follows the definition
-    from official Spark Partitioner.
-    """
+    tilesstr = None
 
-    def __call__(self, k: Any, *args):
-        return self.partitionFunc(k, *args) % self.numPartitions
+    """
+    Defines a partition strategy. Follows the definition from official
+    Spark Partitioner.
+    """
 
     @abstractmethod
     def num_partitions(self) -> int:
         """Return the total number of partitions."""
         pass
 
-    @abstractmethod
-    def get_partition(self, key: int, data: Any, utc_time="UTC", **kwargs) -> int:
-        """Return the partition index for the given key. Pass any kwargs as needed. """
-        pass
-
-
-class MobilityRDD(RDD):
-    def partitionBy(
-        self: "RDD[Tuple[K, V]]",
-        numPartitions: Optional[int],
-        partitionFunc: Callable[[K], int] = portable_hash,
-        **kwargs
-    ) -> "RDD[Tuple[K, V]]":
+    def as_spark_table(self):
         """
-        Partitions the RDD according to the mobility data.
+        Calls the TileSparkCreator class to return a PySpark DataFrame with the
+        tileid, tile to use. Useful when we need to partition multiple
+        tables based on the same tiling.
 
-        Parameters
-        ----------
-        numPartitions : int, optional
-            the number of partitions in new :class:`RDD`
-        partitionFunc : function, optional, default `portable_hash`
-            function to compute the partition index
-
-        Returns
-        -------
-        :class:`RDD`
-            a :class:`RDD` partitioned using the specified partitioner
-
-        See Also
-        --------
-        :meth:`RDD.repartition`
-        :meth:`RDD.repartitionAndSortWithinPartitions`
-
-        Examples
-        --------
-        >>> j = 0
-        >>> sets = pairs.partitionBy(2).glom().collect()
-        >>> len(set(sets[0]).intersection(set(sets[1])))
+        :return: A PySpark Dataframe with the tileid, tile from the partitioner.
         """
-        if numPartitions is None:
-            numPartitions = self._defaultReducePartitions()
-        partitioner = Partitioner(numPartitions, partitionFunc)
-        if self.partitioner == partitioner:
-            return self
+        tilesstr = self.tilesstr  # Do this so that spark doesn't break
+        return TilePartitionedTable(F.lit(tilesstr))
 
-        # Transferring O(n) objects to Java is too expensive.
-        # Instead, we'll form the hash buckets in Python,
-        # transferring O(numPartitions) objects to Java.
-        # Each object is a (splitNumber, [objects]) pair.
-        # In order to avoid too huge objects, the objects are
-        # grouped into chunks.
-        outputSerializer = self.ctx._unbatched_serializer
+    @staticmethod
+    def get_partition(
+        movingobject: Union[TGeomPoint, TGeogPoint, STBox, Geometry],
+        tiles: List[STBox],
+        utc_time: str = "UTC"
+    ) -> int:
+        """
+        Function to partition a moving object and return the partition index(es)
+        of the object, given a list of partition tiles. In practice,
+        this function is replaced by the UDTF generators.
 
-        limit = self._memory_limit() / 2
+        :param movingobject: The PyMEOS datatype to partition.
+        :param tiles: STBoxes representing the partition space.
+        :param utc_time: UTC time to use with PyMEOS.
+        :return: Yields the partition indexes, belonging in the partition space.
+            If no tile matches the movingobject, or a part of it, it is assigned
+            -1.
+        """
+        pymeos_initialize(utc_time)
 
-        def add_shuffle_key(split: int, iterator: Iterable[Tuple[K, V]]) -> Iterable[bytes]:
+        for idx, tile in enumerate(tiles):
+            stbox: STBox = STBox(tile).set_srid(0)
+            if type(movingobject) == Geometry:
+                if tile.overlaps(movingobject) is not None:
+                    yield idx
+            if type(movingobject) == STBox:
+                if tile.intersection(movingobject) is not None:
+                    yield idx
+            if movingobject.at(stbox) is not None:
+                yield idx
 
-            buckets = defaultdict(list)
-            c, batch = 0, min(10 * numPartitions, 1000)  # type: ignore[operator]
+        yield -1
 
-            for k, v in iterator:
-                buckets[partitionFunc(k, data=v) % numPartitions].append((k, v))  # type: ignore[operator]
-                c += 1
+    def plot(self, how: str = 'xy', **kwargs):
+        """
+        Plots the tiles.
 
-                # check used memory and avg size of chunk of objects
-                if c % 1000 == 0 and get_used_memory() > limit or c > batch:
-                    n, size = len(buckets), 0
-                    for split in list(buckets.keys()):
-                        yield pack_long(split)
-                        d = outputSerializer.dumps(buckets[split])
-                        del buckets[split]
-                        yield d
-                        size += len(d)
+        :param how: Indicate how to plot. Options are: 'xy', 'xt', 'yt'.
+        :param kwargs: Arguments to pass to the plotter.
+        :return:
+        """
+        for tile in self.tilesstr:
+            stbox = STBox(tile)
+            if how == 'xy':
+                stbox.plot_xy(**kwargs)
+            elif how == 'xt':
+                stbox.plot_xt(**kwargs)
+            elif how == 'yt':
+                stbox.plot_yt(**kwargs)
 
-                    avg = int(size / n) >> 20
-                    # let 1M < avg < 10M
-                    if avg < 1:
-                        batch = min(sys.maxsize, batch * 1.5)  # type: ignore[assignment]
-                    elif avg > 10:
-                        batch = max(int(batch / 1.5), 1)
-                    c = 0
 
-            for split, items in buckets.items():
-                yield pack_long(split)
-                yield outputSerializer.dumps(items)
+partition_schema = StructType(
+    [
+        StructField("movingobjectid", StringType()),
+        StructField("tileid", IntegerType()),
+        StructField("movingobject", TGeomPointSeqSetUDT()),
+    ]
+)
 
-        keyed = self.mapPartitionsWithIndex(add_shuffle_key, preservesPartitioning=True)
-        keyed._bypass_serializer = True  # type: ignore[attr-defined]
-        assert self.ctx._jvm is not None
 
-        with SCCallSiteSync(self.context):
-            pairRDD = self.ctx._jvm.PairwiseRDD(keyed._jrdd.rdd()).asJavaPairRDD()
-            jpartitioner = self.ctx._jvm.PythonPartitioner(numPartitions, id(partitionFunc))
-        jrdd = self.ctx._jvm.PythonRDD.valueOfPair(pairRDD.partitionBy(jpartitioner))
-        rdd: "RDD[Tuple[K, V]]" = RDD(jrdd, self.ctx, BatchedSerializer(outputSerializer))
-        rdd.partitioner = partitioner
-        return rdd
+class BasePartitionUDTF:
+    def __init__(
+            self,
+            response_extra_cols: Iterable = None,
+            check_function: Callable = None,
+            return_full_traj: bool = False
+    ):
+        """
+        Useful to inherit this class to other UDTFs that have the same behavior
+        but need to yield extra tables.
+
+        :param response_extra_cols: Iterable containing the column names to
+        yield along with the predefined schema.
+        :param check_function: If passed, this function is used to tile the data.
+        :param return_full_traj: If True, returns the full movingobject instead
+        of the partition corresponding to the tile.
+        """
+
+        self.response_extra_cols = response_extra_cols
+        self.check_function = check_function
+        self.return_full_traj = return_full_traj
+
+    def eval_wrap(self, row: Row):
+        """
+        Caller function to yield values into the new table.
+        Basic behavior expects a row with the following values:
+            - trajectory_id (int)
+            - trajectory (PyMEOS type)
+            - tiles (List[PyMEOS type])
+            - tileids (List[int])
+
+        This class and function should be inherited and overriden to fit
+        each use case, for instance, to add more columns to the output schema.
+
+        Any UDTF in PySpark should be registered to the SparkContext as:
+            spark.udtf.register("PartitionUDTF", PartitionUDTF)
+
+        This is already handled by PySparkMEOS for the included classes.
+
+        Example call:
+
+            SELECT *
+            FROM PartitionUDTF(
+                TABLE(
+                        SELECT
+                            trajectory_id,
+                            trajectory,
+                            (SELECT collect_list(tile) FROM grid) AS tiles,
+                            (SELECT collect_list(tileid) FROM grid) AS tileids
+                        FROM trips
+                )
+            )
+
+        :param row: The Row type with the values. Automatically passed by
+            Pyspark.
+
+        :return: A new dataframe with the partitioned data, with the schema:
+            - predefined columns (if provided).
+            - mobilityobjectid (str)
+            - tileid (int)
+            - movingobject (PySparkMEOSUDT)
+        """
+        pymeos_initialize()
+
+        trajectory_id = row.trajectory_id
+        trajectory = row.movingobject
+        tiles = row.tiles
+        tileids = row.tileids
+
+        if not self.check_function:
+            partitioned = [
+                (key, trajectory.at(tile))
+                for key, tile in zip(tileids, tiles)
+            ]
+        else:
+            partitioned = [
+                (key, self.check_function(trajectory, tile))
+                for key, tile in zip(tileids, tiles)
+            ]
+        count = 0
+        for partition_key, partition_traj in partitioned:
+            count += 1
+            if partition_traj is None or partition_traj is False:
+                continue
+            else:
+                response = [
+                    row[col]
+                    for col in self.response_extra_cols if
+                    self.response_extra_cols
+                ]
+                if self.return_full_traj:
+                    response.extend(
+                        [trajectory_id, partition_key, trajectory]
+                    )
+                else:
+                    response.extend(
+                        [trajectory_id, partition_key, partition_traj]
+                    )
+                yield response
+
+
+@F.udtf(returnType=partition_schema)
+class PartitionUDTF:
+    """
+    Sample class for partitioning mobility data with PySpark and PyMEOS.
+    Should be inherited and overriden to fit the schema at hand.
+    """
+    def __init__(self, response_extra_cols: Iterable = None):
+        """
+        Useful to inherit this class to other UDTFs that have the same behavior
+        but need to yield extra tables.
+
+        :param response_extra_cols: Iterable containing the column names to
+        yield along with the predefined schema.
+        """
+        self.response_extra_cols = response_extra_cols
+
+    def eval(self, row: Row):
+        """
+        Caller function to yield values into the new table.
+        Basic behavior expects a row with the following values:
+            - trajectory_id (int)
+            - trajectory (PyMEOS type)
+            - tiles (List[PyMEOS type])
+            - tileids (List[int])
+
+        This class and function should be inherited and overriden to fit
+        each use case, for instance, to add more columns to the output schema.
+
+        Any UDTF in PySpark should be registered to the SparkContext as:
+            spark.udtf.register("PartitionUDTF", PartitionUDTF)
+
+        This is already handled by PySparkMEOS for the included classes.
+
+        Example call:
+
+            SELECT *
+            FROM PartitionUDTF(
+                TABLE(
+                        SELECT
+                            trajectory_id,
+                            trajectory,
+                            (SELECT collect_list(tile) FROM grid) AS tiles,
+                            (SELECT collect_list(tileid) FROM grid) AS tileids
+                        FROM trips
+                )
+            )
+
+        :param row: The Row type with the values. Automatically passed by
+            Pyspark.
+
+        :return: A new dataframe with the partitioned data, with the schema:
+            - predefined columns (if provided).
+            - mobilityobjectid (str)
+            - tileid (int)
+            - movingobject (PySparkMEOSUDT)
+        """
+        pymeos_initialize()
+
+        trajectory_id = row['trajectory_id']
+        trajectory = row['trajectory']
+        tiles = row['tiles']
+        tileids = row['tileids']
+
+        partitioned = [
+            (key, trajectory.at(tile))
+            for key, tile in zip(tileids, tiles)
+        ]
+        count = 0
+        response = [
+            row[col]
+            for col in self.response_extra_cols if self.response_extra_cols
+        ]
+        for partition_key, partition_traj in partitioned:
+            count += 1
+            if partition_traj is None:
+                continue
+            else:
+                response.extend([trajectory_id, partition_key, partition_traj])
+                yield response
+
+
+@F.udtf(returnType=StructType([
+    StructField("tileid", IntegerType()),
+    StructField("tile", STBoxUDT())
+]))
+class TilePartitionedTable:
+    """
+    Class to create a Spark dataframe containing the tiles and the tileids.
+    """
+    def eval(
+            self,
+            tilesstr: List[str],
+            col_dict={},
+            utc_time: str = "UTC"
+    ):
+        """
+        :param tilesstr: List of STBox strings representing the tiles
+        :param col_dict: Dictionary to handle column names when using rows.
+        :param utc_time: UTC Time to use in PyMEOS.
+        :return: The new PySpark DataFrame with the schema:
+            - tileid (int)
+            - tile (STBox)
+        """
+        pymeos_initialize(utc_time)
+        for tileid, tile in enumerate(tilesstr):
+            yield tileid, STBox(tile)
