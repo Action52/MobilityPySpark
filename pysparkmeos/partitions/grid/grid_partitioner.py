@@ -1,7 +1,7 @@
 from pymeos import *
 from typing import *
 
-from pysparkmeos.partitions.mobilityrdd import MobilityPartitioner
+from pysparkmeos.partitions.mobility_partitioner import MobilityPartitioner
 from pysparkmeos.UDT.MeosDatatype import *
 
 from pyspark.sql.types import *
@@ -26,12 +26,16 @@ class GridPartition(MobilityPartitioner):
         partition.
         :param geodetic: True if data is geodetic, else False.
         """
-        grid = [
+        self.grid = [
             tile.set_srid(0)
-            for tile in self._generate_grid(bounds, cells_per_side, geodetic=geodetic)
+            for tile in self._generate_grid(
+                bounds,
+                cells_per_side,
+                geodetic=geodetic
+            )
         ]
-        self.tilesstr = [str(tile) for tile in grid]
-        self.total_partitions = len(grid)
+        self.tilesstr = [str(tile) for tile in self.grid]
+        self.total_partitions = len(self.grid)
         super().__init__(self.total_partitions, self.get_partition)
 
     @staticmethod

@@ -8,6 +8,8 @@ from pymeos import *
 from shapely.geometry import Point, Polygon
 from shapely import from_wkt, to_wkt, Geometry
 
+from pysparkmeos.UDT.wrappers import *
+
 T = TypeVar('T')
 
 
@@ -29,7 +31,7 @@ class MeosDatatypeUDT(Generic[T], UserDefinedType):
 
     def serialize(self, obj: T) -> str:
         """
-        Serializes the Python object to a byte array using pickle.
+        Serializes the Python object to a string using pickle.
 
         :param obj: The object to serialize.
         :return: The serialized object as a byte array.
@@ -48,129 +50,20 @@ class MeosDatatypeUDT(Generic[T], UserDefinedType):
         Factory method to create an instance of T from a string.
         This method should be overridden by all subclasses.
         """
-        raise NotImplementedError("Subclasses must implement from_string method.")
+        raise NotImplementedError(
+            "Subclasses must implement from_string method."
+        )
 
     def simpleString(self) -> str:
         return "meosdatatype"
 
-"""
-#########################
-WRAPPERS
-#########################
-"""
-
-class MeosWrap:  
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = self(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-class TGeogPointInstWrap(TGeogPointInst):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = TGeogPointInst(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-class STBoxWrap(STBox):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = STBox(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-class TGeogPointSeqSetWrap(TGeogPointSeqSet):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = TGeogPointSeqSet(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-
-class TGeogPointSeqWrap(TGeogPointSeq):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = TGeogPointSeq(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-class TGeomPointInstWrap(TGeomPointInst):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = TGeomPointInst(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-class TGeomPointSeqWrap(TGeomPointSeq):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = TGeomPointSeq(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-class TGeomPointSeqSetWrap(TGeomPointSeqSet):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = TGeomPointSeqSet(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
-
-
-class TBoolInstWrap(TBoolInst):
-    def __setstate__(self, state):
-        pymeos_initialize()
-        #print("Im being unpickled: ", state)
-        self._inner = TBoolInst(state)._inner
-
-    def __getstate__(self):
-        pymeos_initialize()
-        #print("Im being pickled: ", self.__str__())
-        return self.__str__()
 
 """
 #########################
 UDTs
 #########################
 """
+
 
 class TGeogPointInstUDT(MeosDatatypeUDT[TGeogPointInstWrap]):
     def simpleString(self) -> str:

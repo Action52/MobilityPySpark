@@ -9,10 +9,6 @@ from pyspark.sql.types import *
 
 from shapely import wkb, Geometry
 
-from pysparkmeos.utils.udt_appender import udt_append
-from pysparkmeos.utils.utils import register_udfs_under_spark_sql, \
-    register_udtfs_under_spark_sql
-
 from typing import *
 from datetime import datetime
 
@@ -443,6 +439,25 @@ def datetime_to_tinstant(
     return TBoolInst.from_base_time(value=value, base=instant)
 
 
+@F.udf(returnType=ArrayType(TimestampType()))
+def timestamps(trajectory, utc="UTC"):
+    pymeos_initialize(utc)
+    return trajectory.timestamps()
+
+
+@F.udf(returnType=ArrayType(FloatType()))
+def spatial_values(trajectory: Temporal, dim="x", utc="UTC"):
+    pymeos_initialize(utc)
+    dim_vals = None
+    if dim=="x":
+        dim_vals = [instant.x().start_value() for instant in trajectory.instants()]
+    elif dim == "y":
+        dim_vals = [instant.y().start_value() for instant in trajectory.instants()]
+    elif dim == "z":
+        dim_vals = [instant.z().start_value() for instant in trajectory.instants()]
+    return dim_vals
+
+
 @F.udf(returnType=TGeomPointSeqSetUDT())
 def tgeompointseqset(trip: str, utc: str = "UTC") -> TGeomPointSeqSet:
     """
@@ -465,13 +480,6 @@ def main():
         .master("local[1]") \
         .config("spark.sql.execution.arrow.maxRecordsPerBatch", "100") \
         .getOrCreate()
-
-    # Append the UDT mapping to the PyMEOS classes
-    udt_append()
-    # Register udfs in Spark SQL
-    register_udfs_under_spark_sql(spark)
-    # Register the udtfs in Spark SQL
-    register_udtfs_under_spark_sql(spark)
 
     spark.udf.register("tgeompointseqset", tgeompointseqset)
 

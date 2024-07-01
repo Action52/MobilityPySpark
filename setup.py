@@ -11,13 +11,12 @@ setup(
     author_email='leonvillapun@gmail.com',
     url='https://github.com/yourusername/pysparkmeos',
     install_requires=[
-        'pyspark>=3.0',
         'pymeos'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',  # Update the license as needed
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',

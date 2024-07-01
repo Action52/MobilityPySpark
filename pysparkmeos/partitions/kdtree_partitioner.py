@@ -1,5 +1,5 @@
-from pysparkmeos.partitions.mobilityrdd import MobilityPartitioner
-from pysparkmeos.utils.utils import new_bounds_from_axis
+from pysparkmeos.partitions.mobility_partitioner import MobilityPartitioner
+from pysparkmeos.utils.utils import new_bounds_from_axis, from_axis
 from typing import *
 from pymeos import *
 from pymeos import TPoint
@@ -11,10 +11,14 @@ class KDTreePartition(MobilityPartitioner):
     """
 
     def __init__(
-        self, movingObjects: List[TPoint], bounds: STBox, dimensions: list, max_depth=12
+            self,
+            moving_objects: List[TPoint],
+            bounds: STBox,
+            dimensions: tuple,
+            max_depth=12
     ):
         """
-        :param movingObjects: A list containing the moving objects (or a sample)
+        :param moving_objects: A list containing the moving objects (or a sample)
         to create the partition structure with.
         :param bounds: STBox with the precalculated bounds of the space.
         :param dimensions: Dimensions to partition by in each recursion.
@@ -24,7 +28,7 @@ class KDTreePartition(MobilityPartitioner):
         """
         self.max_depth = max_depth
         self.bounds = bounds
-        self.grid = self._generate_grid(bounds, movingObjects, 0, dimensions, max_depth)
+        self.grid = self._generate_grid(bounds, moving_objects, 0, dimensions, max_depth)
         self.numPartitions = len(self.grid)
         self.tilesstr = [tile.__str__() for tile in self.grid]
         super().__init__(self.numPartitions, self.get_partition)
@@ -34,7 +38,7 @@ class KDTreePartition(MobilityPartitioner):
         bounds: STBox,
         movingobjects: List[TPoint],
         depth: int = 0,
-        dimensions: list = ["x", "y", "t"],
+        dimensions: tuple = ("x", "y", "t"),
         max_depth=12,
     ):
         """
@@ -55,7 +59,9 @@ class KDTreePartition(MobilityPartitioner):
         pointsat = [point.at(bounds) for point in movingobjects]
 
         if type(pointsat[0]) == TGeomPointSeq:
-            convert = [instant for point in pointsat for instant in point.instants()]
+            convert = [
+                instant for point in pointsat for instant in point.instants()
+            ]
             movingobjects = convert
         if type(pointsat[0]) == TGeomPointSeqSet:
             convert = [
@@ -65,23 +71,6 @@ class KDTreePartition(MobilityPartitioner):
                 for instant in seq.instants()
             ]
             movingobjects = convert
-
-        def from_axis(p: TPoint, axis: str):
-            """
-            Helper function to get the sorting dimension of a TPoint.
-            :param p: TPoint to analize
-            :param axis: Character representing the axis. Example: 'x'.
-            :return: Sorting value.
-            """
-            b = p
-            if axis == "x":
-                return b.x().start_value()
-            if axis == "y":
-                return b.y().start_value()
-            if axis == "z":
-                return b.z().start_value()
-            if axis == "t":
-                return b.timestamp()
 
         # Sort the generator
         movingobjects = sorted(movingobjects, key=lambda p: from_axis(p, axis))
@@ -124,7 +113,10 @@ class KDTreePartition(MobilityPartitioner):
 def gentestdata(read_as='TInst'):
     import pandas as pd
 
-    testtrips = pd.read_csv("../mobilitydb-berlinmod-sf0.1/trips_sample_pymeos.csv", index_col=0)
+    testtrips = pd.read_csv(
+        "../mobilitydb-berlinmod-sf0.1/trips_sample_pymeos.csv",
+        index_col=0
+    )
     testtrips['trip'] = testtrips['trip'].apply(lambda x: TGeomPointSeqSet(x))
     bounds = TemporalPointExtentAggregator().aggregate(testtrips['trip'])
     seqs1 = []
@@ -148,8 +140,8 @@ def main():
     testtrips, bounds = gentestdata(read_as='TSeq')
     print(bounds)
     kdpart = KDTreePartition(
-        movingObjects=testtrips,
-        dimensions=['x', 'y'],
+        moving_objects=testtrips,
+        dimensions=('x', 'y'),
         bounds=bounds,
         max_depth=3
     )

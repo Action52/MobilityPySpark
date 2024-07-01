@@ -1,6 +1,6 @@
 from pymeos import *
 from pysparkmeos.UDT.MeosDatatype import *
-from pysparkmeos.partitions.mobilityrdd import BasePartitionUDTF
+from pysparkmeos.UDTF.base_partition_udtf import BasePartitionUDTF
 from pyspark.sql.types import *
 import pyspark.sql.functions as F
 
