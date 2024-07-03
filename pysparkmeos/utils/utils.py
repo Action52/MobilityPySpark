@@ -29,6 +29,8 @@ def register_udfs_under_spark_sql(spark: SparkSession):
     spark.udf.register("datetime_to_tinstant", datetime_to_tinstant)
     spark.udf.register("timestamps", timestamps)
     spark.udf.register("spatial_values", spatial_values)
+    spark.udf.register("num_instants", num_instants)
+    spark.udf.register("length", length)
 
 
 def register_udtfs_under_spark_sql(spark: SparkSession):

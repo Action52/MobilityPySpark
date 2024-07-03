@@ -1,5 +1,9 @@
+from datetime import datetime
 import math
 
+from pyspark import Row
+
+from pysparkmeos.UDT import STBoxWrap
 from pysparkmeos.partitions.grid.grid_partitioner import GridPartition
 from pysparkmeos.partitions.mobility_partitioner import MobilityPartitioner
 from pysparkmeos.utils.utils import new_bounds_from_axis, from_axis, new_bounds
@@ -11,50 +15,58 @@ import pandas as pd
 import itertools
 
 
-class AdaptiveBinsPartitioner(MobilityPartitioner):
+class ApproximateAdaptiveBinsPartitioner(MobilityPartitioner):
     """
-    Class to partition data using a KDTree.
+    Class to partition data using an AdaptiveBinsPartitioner approximated with
+    Spark Map-Reduce as engine.
     """
 
     def __init__(
             self,
+            df,
+            colname,
             bounds,
-            movingobjects,
             num_tiles,
             dimensions=["x", "y", "t"],
             utc="UTC"
     ):
-        self.grid = [
-            tile for tile in self._generate_grid(
-                bounds, movingobjects, num_tiles, dimensions, utc
-            )
-        ]
+        self.grid = self.spark_generate_grid(
+            df,
+            colname,
+            bounds,
+            num_tiles,
+            dimensions,
+            utc
+        )
         self.tilesstr = [tile.__str__() for tile in self.grid]
         self.numPartitions = len(self.tilesstr)
         super().__init__(self.numPartitions, self.get_partition)
 
-
     @staticmethod
-    def _generate_grid(
+    def spark_generate_grid(
+            df,
+            colname,
             bounds: STBox,
-            movingobjects: List[TPoint],
             num_tiles: int,
-            dimensions = ["x", "y", "t"],
+            dimensions=["x", "y", "t"],
             utc: str = "UTC"
     ):
         pymeos_initialize(utc)
 
         unchecked_dims = dimensions
         new_tiles = {}
-        while(unchecked_dims):
+        while (unchecked_dims):
             cur_dim = unchecked_dims.pop()
-            new_tiles[cur_dim] = AdaptiveBinsPartitioner._generate_grid_dim(
-                            bounds,
-                            movingobjects,
-                            cur_dim,
-                            num_tiles,
-                            utc
-            )
+            new_tiles[cur_dim] = df.select(colname).rdd.mapPartitions(
+                lambda x: ApproximateAdaptiveBinsPartitioner.map_generate_grid_dim(
+                    x, colname, bounds, cur_dim, num_tiles, utc)
+            ).reduceByKey(
+                lambda x, y: ApproximateAdaptiveBinsPartitioner.reduce_generate_grid_dim(x, y)
+            ).map(
+                lambda x: (ApproximateAdaptiveBinsPartitioner.map_generate_stbox_dim(x[0], x[1], utc, cur_dim, bounds,
+                                           num_tiles))
+            ).collect()
+            # print(new_tiles[cur_dim])
 
         tiles = []
         for combination in itertools.product(*new_tiles.values()):
@@ -69,18 +81,21 @@ class AdaptiveBinsPartitioner(MobilityPartitioner):
                 tiles.append(intersection_box)
         return tiles
 
-
     @staticmethod
-    def _generate_grid_dim(
+    def map_generate_grid_dim(
+            movingobjects,
+            colname,
             bounds: STBox,
-            movingobjects: List[TPoint],
             dim: str,
             num_tiles: int,
             utc: str
     ):
         pymeos_initialize(utc)
 
-        pointsat = [point.at(bounds) for point in movingobjects if point.at(bounds)]
+        movingobjects = [mo[colname] for mo in movingobjects if type(mo) == Row]
+
+        pointsat = [point.at(bounds) for point in movingobjects if
+                    point.at(bounds)]
         values = None
 
         # Extract the values from the corresponding dimension
@@ -88,37 +103,38 @@ class AdaptiveBinsPartitioner(MobilityPartitioner):
             values = [
                 instant.x().start_value()
                 for traj in pointsat
-                    for instant in traj.instants()
+                for instant in traj.instants()
             ]
         if dim == 'y':
             values = [
                 instant.y().start_value()
                 for traj in pointsat
-                    for instant in traj.instants()
+                for instant in traj.instants()
             ]
         if dim == 'z':
             values = [
                 instant.z().start_value()
                 for traj in pointsat
-                    for instant in traj.instants()
+                for instant in traj.instants()
             ]
         if dim == 't':
             values = [
                 timestamp
                 for traj in pointsat
-                    for timestamp in traj.timestamps()
+                for timestamp in traj.timestamps()
             ]
         num_points = len(values)
         values = sorted(values)
         max_value = max(values)
         if len(values) == 1:
             return [new_bounds(bounds, dim, values[0], max_value)]
+        # print(values)
         if dim == 't':
             valuest = sorted(
                 list({value.timestamp(): value for value in values}.values()))
         else:
             valuest = values
-            # print(valuest)
+        # print(valuest)
         bins = pd.qcut(valuest, q=num_tiles, labels=False)
         df = pd.DataFrame({
             'Value': valuest,
@@ -128,8 +144,8 @@ class AdaptiveBinsPartitioner(MobilityPartitioner):
         df = df.where(df.RowNo == 1).sort_values('Value').reset_index(drop=True)
         df['Lead'] = df['Value'].shift(-1)
         df['Lead'] = df['Lead'].fillna(max_value)
-        #print(values)
-        #print(df)
+        # print(values)
+        # print(df)
 
         binvals = [
             (min_val, max_val)
@@ -139,10 +155,71 @@ class AdaptiveBinsPartitioner(MobilityPartitioner):
         ]
 
         tiles = [
-            new_bounds(bounds, dim, bin[0], bin[1])
+            STBoxWrap(new_bounds(bounds, dim, bin[0], bin[1]).__str__())
             for bin in binvals if bin[0] != bin[1]
         ]
-        return tiles
+        return [(i, (bin[0], bin[1])) for i, bin in enumerate(binvals) if
+                bin[0] != bin[1]]
+
+    @staticmethod
+    def reduce_generate_grid_dim(
+            val1, val2):
+        def average_datetimes(dt1, dt2):
+            """ Compute the average of two datetime objects. """
+            # Convert datetime objects to timestamps (seconds since the epoch)
+            timestamp1 = dt1.timestamp()
+            timestamp2 = dt2.timestamp()
+            # Calculate the average timestamp and convert it back to datetime
+            mean_timestamp = (timestamp1 + timestamp2) / 2
+            meandt = datetime.fromtimestamp(mean_timestamp)
+            meandt = meandt.replace(tzinfo=dt1.tzinfo)
+            return meandt
+
+            # Check if the first item in the tuples are instances of datetime
+
+        if isinstance(val1[0], datetime) and isinstance(val2[0], datetime):
+            meanmin = average_datetimes(val1[0], val2[0])
+            meanmax = average_datetimes(val1[1], val2[1])
+        else:
+            # Assuming the values are numeric (int or float)
+            meanmin = round((val1[0] + val2[0]) / 2, 2)
+            meanmax = round((val1[1] + val2[1]) / 2, 2)
+
+        return (meanmin, meanmax)
+
+    @staticmethod
+    def map_generate_stbox_dim(
+            key,
+            vals,
+            utc,
+            dim,
+            bounds,
+            num_tiles
+    ):
+        pymeos_initialize(utc)
+        minval = vals[0]
+        maxval = vals[1]
+        if key == 0:
+            if dim == 'x':
+                minval = min(bounds.xmin(), vals[0])
+            if dim == 'y':
+                minval = min(bounds.ymin(), vals[0])
+            if dim == 'z':
+                minval = min(bounds.zmin(), vals[0])
+            if dim == 't':
+                # mint = vals[0].astimezone(utc)
+                minval = min(bounds.tmin(), vals[0])
+        if key == num_tiles - 1:
+            if dim == 'x':
+                maxval = max(bounds.xmax(), vals[1])
+            if dim == 'y':
+                maxval = max(bounds.ymax(), vals[1])
+            if dim == 'z':
+                maxval = max(bounds.zmax(), vals[1])
+            if dim == 't':
+                # maxt = vals[1].astimezone(utc)
+                maxval = max(bounds.tmax(), vals[1])
+        return STBoxWrap(new_bounds(bounds, dim, minval, maxval).__str__())
 
     def num_partitions(self) -> int:
         """Return the total number of partitions."""
@@ -177,9 +254,8 @@ def gentestdata(read_as='TInst'):
 def main():
     pymeos_initialize()
     testtrips, bounds = gentestdata(read_as='TSeqSet')
-    mdtpart = AdaptiveBinsPartitioner(
+    mdtpart = ApproximateAdaptiveBinsPartitioner(
         bounds=bounds,
-        movingobjects=testtrips,
         num_tiles=3,
         dimensions=["x", "y"],
         utc="UTC"

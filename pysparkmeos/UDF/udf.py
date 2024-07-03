@@ -470,6 +470,18 @@ def tgeompointseqset(trip: str, utc: str = "UTC") -> TGeomPointSeqSet:
     return TGeomPointSeqSet(trip)
 
 
+@F.udf(returnType=IntegerType())
+def num_instants(traj: TPoint, utc="UTC"):
+    pymeos_initialize(utc)
+    return traj.num_instants()
+
+
+@F.udf(returnType=FloatType())
+def length(traj: TPoint, utc="UTC"):
+    pymeos_initialize(utc)
+    return traj.length()
+
+
 def main():
     # Initialize PyMEOS
     pymeos_initialize("UTC")
