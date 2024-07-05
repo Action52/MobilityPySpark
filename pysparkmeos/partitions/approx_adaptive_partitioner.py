@@ -57,15 +57,15 @@ class ApproximateAdaptiveBinsPartitioner(MobilityPartitioner):
         new_tiles = {}
         while (unchecked_dims):
             cur_dim = unchecked_dims.pop()
-            new_tiles[cur_dim] = df.select(colname).rdd.mapPartitions(
+            reduced_bounds = df.select(colname).rdd.mapPartitions(
                 lambda x: ApproximateAdaptiveBinsPartitioner.map_generate_grid_dim(
                     x, colname, bounds, cur_dim, num_tiles, utc)
             ).reduceByKey(
                 lambda x, y: ApproximateAdaptiveBinsPartitioner.reduce_generate_grid_dim(x, y)
-            ).map(
-                lambda x: (ApproximateAdaptiveBinsPartitioner.map_generate_stbox_dim(x[0], x[1], utc, cur_dim, bounds,
-                                           num_tiles))
             ).collect()
+            new_tiles[cur_dim] = ApproximateAdaptiveBinsPartitioner.make_bounds_contiguous(
+                reduced_bounds, bounds, cur_dim
+            )
             # print(new_tiles[cur_dim])
 
         tiles = []
@@ -220,6 +220,49 @@ class ApproximateAdaptiveBinsPartitioner(MobilityPartitioner):
                 # maxt = vals[1].astimezone(utc)
                 maxval = max(bounds.tmax(), vals[1])
         return STBoxWrap(new_bounds(bounds, dim, minval, maxval).__str__())
+
+    @staticmethod
+    def make_bounds_contiguous(bounds_list, real_bounds, dim):
+        sorted_bounds = sorted(bounds_list, key=lambda x: x[1][0])
+        contiguous_bounds = []
+
+        current_max = sorted_bounds[0][1][0]  # Start with the first min_bound
+        processed = set()
+        for i, (index, (min_bound, max_bound)) in enumerate(sorted_bounds):
+            if (min_bound, max_bound) in processed:
+                continue
+            adjusted_min_bound = current_max
+            adjusted_max_bound = max_bound
+            contiguous_bounds.append(
+                (i, (adjusted_min_bound, adjusted_max_bound)))
+            current_max = adjusted_max_bound
+            processed.add((min_bound, max_bound))
+        final_bounds = []
+        for key, (min_bound, max_bound) in contiguous_bounds:
+            minval = min_bound
+            maxval = max_bound
+            if key == 0:
+                if dim == 'x':
+                    minval = min(real_bounds.xmin(), minval)
+                if dim == 'y':
+                    minval = min(real_bounds.ymin(), minval)
+                if dim == 'z':
+                    minval = min(real_bounds.zmin(), minval)
+                if dim == 't':
+                    minval = min(real_bounds.tmin(), minval)
+            if key == len(contiguous_bounds) - 1:
+                if dim == 'x':
+                    maxval = max(real_bounds.xmax(), maxval)
+                if dim == 'y':
+                    maxval = max(real_bounds.ymax(), maxval)
+                if dim == 'z':
+                    maxval = max(real_bounds.zmax(), maxval)
+                if dim == 't':
+                    maxval = max(real_bounds.tmax(), maxval)
+            box = STBoxWrap(
+                new_bounds(real_bounds, dim, minval, maxval).__str__())
+            final_bounds.append(box)
+        return final_bounds
 
     def num_partitions(self) -> int:
         """Return the total number of partitions."""

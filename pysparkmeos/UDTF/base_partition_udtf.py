@@ -94,6 +94,7 @@ class BasePartitionUDTF:
                 for key, tile in zip(tileids, tiles)
             ]
         count = 0
+
         for partition_key, partition_traj in partitioned:
             count += 1
             if partition_traj is None or partition_traj is False:
