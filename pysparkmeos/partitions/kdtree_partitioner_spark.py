@@ -86,6 +86,9 @@ class KDTreePartitionSpark(MobilityPartitioner):
                 upper = instants_at.where(f'rowNo>{mediandim}')
                 midrow = instants_at.where(f'rowNo={mediandim}').first()
 
+            if midrow is None:
+                return tiles
+
             bboxleft = STBoxWrap(
                 new_bounds_from_axis(bounds, dim, midrow[traj_colname],
                                      "left").__str__())
