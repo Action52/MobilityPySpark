@@ -17,7 +17,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
             self,
             spark,
             bounds,
-            df,
+            dfname,
             colname,
             num_tiles,
             dimensions=["x", "y", "t"],
@@ -25,7 +25,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
     ):
         self.grid = [
             tile for tile in self._generate_grid(
-                spark, bounds, df, colname, num_tiles, dimensions, utc
+                spark, bounds, dfname, colname, num_tiles, dimensions, utc
             )
         ]
         self.tilesstr = [tile.__str__() for tile in self.grid]
@@ -36,7 +36,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
     def _generate_grid(
             spark,
             bounds: STBox,
-            df,
+            dfname,
             colname,
             num_tiles: int,
             dimensions=["x", "y", "t"],
@@ -50,7 +50,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
             cur_dim = unchecked_dims.pop()
             new_tiles[
                 cur_dim] = AdaptiveBinsPartitionerSpark._generate_grid_dim(
-                spark, bounds, df, colname, cur_dim, num_tiles, utc)
+                spark, bounds, dfname, colname, cur_dim, num_tiles, utc)
 
         tiles = []
         for combination in itertools.product(*new_tiles.values()):
@@ -69,7 +69,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
     def _generate_grid_dim(
             spark,
             bounds: STBox,
-            df,
+            dfname,
             colname,
             dim: str,
             num_tiles: int,
@@ -77,13 +77,11 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
     ):
         pymeos_initialize(utc)
 
-        df.createOrReplaceTempView('trajectories')
-
         dims_query = f"""
         WITH 
         Vals(dim) AS (
             SELECT explode(spatial_values({colname}, '{dim}'))
-            FROM trajectories
+            FROM {dfname}
             ORDER BY 1 
         ),
         MaxDimVals(MaxDim) AS (
@@ -111,7 +109,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
                 WITH 
                 Times(T) AS (
                     SELECT explode(timestamps(PointSeq))
-                    FROM trajectories
+                    FROM {dfname}
                     ORDER BY 1 
                 ),
                 MaxTime(MaxT) AS (

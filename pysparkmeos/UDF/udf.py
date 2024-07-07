@@ -445,19 +445,6 @@ def timestamps(trajectory, utc="UTC"):
     return trajectory.timestamps()
 
 
-@F.udf(returnType=ArrayType(FloatType()))
-def spatial_values(trajectory: Temporal, dim="x", utc="UTC"):
-    pymeos_initialize(utc)
-    dim_vals = None
-    if dim=="x":
-        dim_vals = [instant.x().start_value() for instant in trajectory.instants()]
-    elif dim == "y":
-        dim_vals = [instant.y().start_value() for instant in trajectory.instants()]
-    elif dim == "z":
-        dim_vals = [instant.z().start_value() for instant in trajectory.instants()]
-    return dim_vals
-
-
 @F.udf(returnType=TGeomPointSeqSetUDT())
 def tgeompointseqset(trip: str, utc: str = "UTC") -> TGeomPointSeqSet:
     """
@@ -480,6 +467,30 @@ def num_instants(traj: TPoint, utc="UTC"):
 def length(traj: TPoint, utc="UTC"):
     pymeos_initialize(utc)
     return traj.length()
+
+
+@F.udf(returnType=TsTzSpanUDT())
+def tstzspan_from_values(lower, upper, utc="UTC"):
+    pymeos_initialize(utc)
+    span = None
+    if lower >= upper:
+        return None
+    try:
+        span = TsTzSpan(lower=lower, upper=upper)
+    except:
+        pass
+    return span
+
+
+@F.udf(returnType=ArrayType(FloatType()))
+def spatial_values(traj, dim, utc='UTC'):
+    pymeos_initialize(utc)
+    if dim == 'x':
+        return traj.x().values()
+    if dim == 'y':
+        return traj.y().values()
+    if dim == 'z':
+        return traj.z().values()
 
 
 def main():
