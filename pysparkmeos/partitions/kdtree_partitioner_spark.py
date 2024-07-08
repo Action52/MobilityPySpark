@@ -73,7 +73,7 @@ class KDTreePartitionSpark(MobilityPartitioner):
                     dim)).orderBy("ts").withColumn('rowNo',
                                                    F.monotonically_increasing_id())
                 # mediandim = instants_at.agg(F.median("ts")).collect()[0]['median(ts)']
-                mediandim = instants_at.approxQuantile("rowNo", [0.5], 0.0)[0]
+                mediandim = instants_at.approxQuantile("rowNo", [0.5], 0.2)[0]
                 lower = instants_at.where(f'rowNo<={mediandim}')
                 upper = instants_at.where(f'rowNo>{mediandim}')
                 midrow = instants_at.where(f'rowNo={mediandim}').first()
@@ -81,13 +81,13 @@ class KDTreePartitionSpark(MobilityPartitioner):
                 instants_at = instants_at.orderBy(dim).withColumn('rowNo',
                                                                   F.monotonically_increasing_id())
                 # mediandim = instants_at.agg(F.median(dim)).collect()[0][f'median({dim})']
-                mediandim = instants_at.approxQuantile("rowNo", [0.5], 0.0)[0]
+                mediandim = instants_at.approxQuantile("rowNo", [0.5], 0.2)[0]
                 lower = instants_at.where(f'rowNo<={mediandim}')
                 upper = instants_at.where(f'rowNo>{mediandim}')
                 midrow = instants_at.where(f'rowNo={mediandim}').first()
 
             if midrow is None:
-                return tiles
+                tiles.extend([])
 
             bboxleft = STBoxWrap(
                 new_bounds_from_axis(bounds, dim, midrow[traj_colname],
