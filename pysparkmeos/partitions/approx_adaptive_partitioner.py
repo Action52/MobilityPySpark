@@ -100,23 +100,11 @@ class ApproximateAdaptiveBinsPartitioner(MobilityPartitioner):
 
         # Extract the values from the corresponding dimension
         if dim == 'x':
-            values = [
-                instant.x().start_value()
-                for traj in pointsat
-                for instant in traj.instants()
-            ]
+            values = [value for traj in pointsat for value in traj.x().values()]
         if dim == 'y':
-            values = [
-                instant.y().start_value()
-                for traj in pointsat
-                for instant in traj.instants()
-            ]
+            values = [value for traj in pointsat for value in traj.y().values()]
         if dim == 'z':
-            values = [
-                instant.z().start_value()
-                for traj in pointsat
-                for instant in traj.instants()
-            ]
+            values = [value for traj in pointsat for value in traj.z().values()]
         if dim == 't':
             values = [
                 timestamp
@@ -124,11 +112,12 @@ class ApproximateAdaptiveBinsPartitioner(MobilityPartitioner):
                 for timestamp in traj.timestamps()
             ]
         num_points = len(values)
+        if num_points <= 1:
+            return []
         values = sorted(values)
         max_value = max(values)
-        if len(values) == 1:
-            return [new_bounds(bounds, dim, values[0], max_value)]
         # print(values)
+
         if dim == 't':
             valuest = sorted(
                 list({value.timestamp(): value for value in values}.values()))

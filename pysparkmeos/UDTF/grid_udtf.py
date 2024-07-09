@@ -31,4 +31,5 @@ class GridUDTF:
         """
         pymeos_initialize(utc_time)
         for tileid, tile in enumerate(tilesstr):
-            yield tileid, STBox(tile)
+            if tile is not None:
+                yield tileid, STBox(tile)

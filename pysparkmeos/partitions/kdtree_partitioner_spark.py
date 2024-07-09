@@ -15,7 +15,9 @@ class KDTreePartitionSpark(MobilityPartitioner):
 
     def __init__(
             self,
+            spark,
             df,
+            instantstablename,
             colname,
             index_colname,
             bounds: STBox,
@@ -34,8 +36,10 @@ class KDTreePartitionSpark(MobilityPartitioner):
         """
         self.max_depth = max_depth
         self.bounds = bounds
-        self.grid = self._generate_grid(df, colname, index_colname, bounds, dimensions, 0, max_depth,
-               utc)
+        self.grid = self._generate_grid(spark, df, instantstablename, colname,
+                                        index_colname, bounds, dimensions, 0,
+                                        max_depth,
+                                        utc)
         self.numPartitions = len(self.grid)
         self.tilesstr = [tile.__str__() for tile in self.grid]
         super().__init__(self.numPartitions, self.get_partition)
@@ -48,46 +52,73 @@ class KDTreePartitionSpark(MobilityPartitioner):
             at = row[traj_colname].at(bounds)
             if at:
                 response.append((
-                                row[index_colname], row[traj_colname], row['x'],
-                                row['y'], row['t'], row['rowNo']))
+                    row[index_colname], row[traj_colname], row['x'],
+                    row['y'], row['t'], row['rowNo']))
         return response
 
     @staticmethod
-    def _generate_grid(instants, traj_colname, index_colname, bounds, dims, depth,
-               max_depth, utc):
+    def _generate_grid(spark, instants, instantstablename, traj_colname,
+                       index_colname, bounds, dims, depth,
+                       max_depth, utc):
         pymeos_initialize(utc)
         dim = dims[depth % len(dims)]
         tiles = []
 
-        instants_at = instants.rdd.mapPartitions(
-            lambda x: KDTreePartitionSpark.map_at(x, traj_colname, index_colname, bounds, utc)
-        ).toDF([index_colname, traj_colname, 'x', 'y', 't', 'rowNo'])
+        instants_at = spark.sql(f"""
+        SELECT * 
+        FROM IsAtUDTF(
+            TABLE(
+                    SELECT * FROM {instantstablename}
+            ),
+            '{bounds.__str__()}'
+        )
+        """).cache()
 
-        num_instants = instants_at.count()
+        if instants_at.isEmpty():
+            return tiles
 
-        if depth == max_depth or num_instants <= 1:
+        if depth == max_depth:
             tiles.append(bounds)
         else:
             if dim == 't':
-                instants_at = instants_at.withColumn("ts", F.unix_timestamp(
-                    dim)).orderBy("ts").withColumn('rowNo',
-                                                   F.monotonically_increasing_id())
                 # mediandim = instants_at.agg(F.median("ts")).collect()[0]['median(ts)']
-                mediandim = instants_at.approxQuantile("rowNo", [0.5], 0.2)[0]
-                lower = instants_at.where(f'rowNo<={mediandim}')
-                upper = instants_at.where(f'rowNo>{mediandim}')
-                midrow = instants_at.where(f'rowNo={mediandim}').first()
+                # mediandim = instants_at.approxQuantile("rowNo", [0.5], 1)[0]
+                rdd = instants_at.rdd.mapPartitionsWithIndex(
+                    lambda i, x: KDTreePartitionSpark.partition_median_index(i,
+                                                                             x,
+                                                                             dim='ts',
+                                                                             rowcol='rowNo')
+                )
+                medians = [median for median in rdd.toLocalIterator() if
+                           median[1]]
+                medians = sorted(medians, key=lambda x: x[1])
+                median_index = len(medians) // 2
+                median = medians[median_index]
+                medianrow = median[1][1]
+                # print(f"Found median row: {medianrow} for dim {dim} level {depth}.")
+                lower = instants_at.where(f'rowNo<={medianrow}')
+                upper = instants_at.where(f'rowNo>{medianrow}')
+                midrow = instants_at.where(f'rowNo={medianrow}').first()
             else:
-                instants_at = instants_at.orderBy(dim).withColumn('rowNo',
-                                                                  F.monotonically_increasing_id())
                 # mediandim = instants_at.agg(F.median(dim)).collect()[0][f'median({dim})']
-                mediandim = instants_at.approxQuantile("rowNo", [0.5], 0.2)[0]
-                lower = instants_at.where(f'rowNo<={mediandim}')
-                upper = instants_at.where(f'rowNo>{mediandim}')
-                midrow = instants_at.where(f'rowNo={mediandim}').first()
-
-            if midrow is None:
-                tiles.extend([])
+                # mediandim = instants_at.approxQuantile("rowNo", [0.5], 1)[0]
+                rdd = instants_at.select(dim,
+                                         "rowNo").rdd.mapPartitionsWithIndex(
+                    lambda i, x: KDTreePartitionSpark.partition_median_index(i,
+                                                                             x,
+                                                                             dim=dim,
+                                                                             rowcol='rowNo')
+                )
+                medians = [median for median in rdd.toLocalIterator() if
+                           median[1]]
+                medians = sorted(medians, key=lambda x: x[1])
+                median_index = len(medians) // 2
+                median = medians[median_index]
+                medianrow = median[1][1]
+                # print(f"Found median row: {medianrow} for dim {dim} level {depth}.")
+                lower = instants_at.where(f'rowNo<={medianrow}')
+                upper = instants_at.where(f'rowNo>{medianrow}')
+                midrow = instants_at.where(f'rowNo={medianrow}').first()
 
             bboxleft = STBoxWrap(
                 new_bounds_from_axis(bounds, dim, midrow[traj_colname],
@@ -96,15 +127,41 @@ class KDTreePartitionSpark(MobilityPartitioner):
                 new_bounds_from_axis(bounds, dim, midrow[traj_colname],
                                      "right").__str__())
 
-            left = KDTreePartitionSpark._generate_grid(lower, traj_colname, index_colname, bboxleft, dims,
-                          depth + 1, max_depth, utc)
-            right = KDTreePartitionSpark._generate_grid(upper, traj_colname, index_colname, bboxright, dims,
-                           depth + 1, max_depth, utc)
+            left = KDTreePartitionSpark._generate_grid(spark, lower,
+                                                       instantstablename,
+                                                       traj_colname,
+                                                       index_colname, bboxleft,
+                                                       dims,
+                                                       depth + 1, max_depth,
+                                                       utc)
+            right = KDTreePartitionSpark._generate_grid(spark, upper,
+                                                        instantstablename,
+                                                        traj_colname,
+                                                        index_colname,
+                                                        bboxright, dims,
+                                                        depth + 1, max_depth,
+                                                        utc)
 
             tiles.extend(left)
             tiles.extend(right)
 
         return tiles
+
+    @staticmethod
+    def partition_median_index(idx, rows, dim, rowcol):
+        median_index = 0
+        values = []
+        for i, row in enumerate(rows):
+            if dim == 'x':
+                rowdim = row.x
+
+            median_index = i // 2
+            values.append((row[dim], row.rowNo,))
+        if values:
+            values = sorted(values, key=lambda x: x[0])
+            return [(idx, values[median_index])]
+        else:
+            return [(idx, None,)]
 
     def num_partitions(self) -> int:
         """Return the total number of partitions."""
