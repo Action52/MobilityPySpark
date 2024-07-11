@@ -23,13 +23,17 @@ class ApproximateAdaptiveBinsPartitioner(MobilityPartitioner):
 
     def __init__(
             self,
+            spark,
             df,
             colname,
             bounds,
             num_tiles,
             dimensions=["x", "y", "t"],
-            utc="UTC"
+            utc="UTC",
+            tablename="trips"
     ):
+        if df is None:
+            df = spark.table(tablename)
         self.grid = self.spark_generate_grid(
             df,
             colname,
@@ -52,7 +56,6 @@ class ApproximateAdaptiveBinsPartitioner(MobilityPartitioner):
             utc: str = "UTC"
     ):
         pymeos_initialize(utc)
-
         unchecked_dims = dimensions
         new_tiles = {}
         while (unchecked_dims):

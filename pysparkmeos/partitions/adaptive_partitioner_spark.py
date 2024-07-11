@@ -108,7 +108,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
             dims_query = f"""
                 WITH 
                 Times(T) AS (
-                    SELECT explode(timestamps(PointSeq))
+                    SELECT explode(timestamps({colname}))
                     FROM {dfname}
                     ORDER BY 1 
                 ),

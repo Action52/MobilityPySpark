@@ -23,6 +23,7 @@ def register_udfs_under_spark_sql(spark: SparkSession):
     spark.udf.register("tgeompointinst", tgeompointinst)
     spark.udf.register("tgeompointseq", tgeompointseq)
     spark.udf.register("at_geom", at_geom)
+    spark.udf.register("at_period", at_period)
     spark.udf.register("tboolinst_from_base_time", tboolinst_from_base_time)
     spark.udf.register("contains_stbox_stbox", contains_stbox_stbox)
     spark.udf.register("temporally_overlaps", temporally_overlaps)

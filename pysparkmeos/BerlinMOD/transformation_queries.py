@@ -12,6 +12,14 @@ transinstants = """
     )
 """
 
+transinstantssimple = """
+    SELECT 
+        instantid,
+        -1 AS tileid,
+        tboolinst_from_base_time(instant, TRUE) AS instant
+    FROM instantsRawNoCache
+"""
+
 transperiod = """
     SELECT * 
     FROM PeriodsUDTF(
@@ -26,6 +34,16 @@ transperiod = """
                 FROM periodsRawNoCache
         )
     )
+"""
+
+transperiodsimple = """
+                SELECT 
+                    periodid,
+                    beginp,
+                    endp,
+                    tstzspan(period) AS period,
+                    -1 AS tileid
+                FROM periodsRawNoCache
 """
 
 transpoints = """
@@ -44,6 +62,16 @@ transpoints = """
     )
 """
 
+transpointssimple = """
+                SELECT 
+                    pointid, 
+                    posx, 
+                    posy, 
+                    geometry_from_hexwkb(geom) AS geom,
+                    -1 AS tileid
+                FROM pointsRawNoCache
+"""
+
 transregions = """
     SELECT * 
     FROM RegionsUDTF(
@@ -58,6 +86,14 @@ transregions = """
     )
 """
 
+transregionssimple = """
+                SELECT 
+                    regionid, 
+                    geometry_from_hexwkb(geom) AS geom,
+                    -1 AS tileid
+                FROM regionsRawNoCache
+"""
+
 transtrips = """
     SELECT 
         tripid, 
@@ -69,5 +105,20 @@ transtrips = """
         trip_from_hexwkb(trip) AS trip, 
         geometry_from_hexwkb(trajectory) AS trajectory, 
         licence 
+    FROM tripsRawNoCache
+"""
+
+transtripssimple = """
+    SELECT 
+        tripid AS movingobjectid, 
+        vehid, 
+        day, 
+        seqno, 
+        sourcenode, 
+        targetnode, 
+        trip_from_hexwkb(trip) AS movingobject, 
+        geometry_from_hexwkb(trajectory) AS trajectory, 
+        licence,
+        -1 AS tileid
     FROM tripsRawNoCache
 """

@@ -196,7 +196,7 @@ def trip_from_hexwkb(trip: str, utc: str = "UTC") -> TGeomPointSeq:
 def tpoint_at(
         trip: TPoint,
         instant: TInstant,
-        return_start_value: bool = False,
+        return_start_value: bool = True,
         utc: str = "UTC"
 ) -> Geometry:
     """
@@ -212,8 +212,7 @@ def tpoint_at(
     if tripat:
         if return_start_value:
             return tripat.start_value()
-        else:
-            return tripat
+    return tripat
 
 
 @F.udf(returnType=BooleanType())
@@ -384,6 +383,16 @@ def at_geom(trip: TPoint, geom: Geometry, utc: str = "UTC") -> TGeomPointSeqSet:
     if trip is None:
         return None
     at = trip.at(geom)
+    if at:
+        return at
+
+
+@F.udf(returnType=TGeomPointSeqSetUDT())
+def at_period(trip: TPoint, period: TsTzSpan, utc: str = "UTC") -> TGeomPointSeqSet:
+    pymeos_initialize(utc)
+    if trip is None:
+        return None
+    at = trip.at(period)
     if at:
         return at
 
