@@ -32,6 +32,7 @@ def register_udfs_under_spark_sql(spark: SparkSession):
     spark.udf.register("spatial_values", spatial_values)
     spark.udf.register("num_instants", num_instants)
     spark.udf.register("length", length)
+    spark.udf.register("geometry_values", geometry_values)
 
 
 def register_udtfs_under_spark_sql(spark: SparkSession):

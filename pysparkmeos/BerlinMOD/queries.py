@@ -126,6 +126,22 @@ querytext11 = """
     SELECT DISTINCT vehid FROM atpoints
 """
 
+### Query 12: Which vehicles met at a point from QueryPoints1 at an instant from QueryInstants1?
+querytext12 = """
+    WITH instants_ts AS (
+        SELECT instants.instantid, timestamps(instants.instant)[0] AS ts, instants.tileid
+        FROM instants
+    ),
+    atinstants AS (
+        SELECT t.vehid, t.movingobjectid, explode(geometry_values(at_period(t.movingobject, i.ts))) AS atinstant, t.tileid
+        FROM trips t INNER JOIN instants_ts i ON (t.tileid=i.tileid)
+        WHERE at_period(t.movingobject, i.ts) IS NOT NULL
+    )
+    SELECT DISTINCT vehid
+    FROM atinstants ai INNER JOIN points p ON (p.tileid = ai.tileid)
+    WHERE ai.atinstant = p.geom
+"""
+
 ### Query 13: Which vehicles travelled within one of the regions from QueryRegions1 during the periods from QueryPeriods1?
 querytext13 = """
     WITH atperiods AS (
@@ -139,6 +155,18 @@ querytext13 = """
         WHERE at_geom(atp.atperiod, r.geom) IS NOT NULL
     )
     SELECT DISTINCT vehid FROM intersections
+"""
+
+### Query 15: Which vehicles passed a point from QueryPoints1 during a period from QueryPeriods1?
+querytext15 = """
+    WITH atperiods AS (
+        SELECT t.vehid, t.movingobjectid, explode(geometry_values(at_period(t.movingobject, p.period))) AS atperiod, t.tileid
+        FROM trips t INNER JOIN periods p ON (t.tileid=p.tileid)
+        WHERE at_period(t.movingobject, p.period) IS NOT NULL
+    )
+    SELECT DISTINCT vehid 
+    FROM atperiods ap INNER JOIN points po ON (ap.tileid = po.tileid)
+    WHERE atperiod = po.geom
 """
 
 #q13, q13stats, plan13 = query_exec(querytext13, spark, explain=True)

@@ -466,6 +466,12 @@ def tgeompointseqset(trip: str, utc: str = "UTC") -> TGeomPointSeqSet:
     return TGeomPointSeqSet(trip)
 
 
+@F.udf(returnType=ArrayType(GeometryUDT()))
+def geometry_values(tpoint: TPoint, utc="UTC"):
+    pymeos_initialize(utc)
+    return tpoint.values()
+
+
 @F.udf(returnType=IntegerType())
 def num_instants(traj: TPoint, utc="UTC"):
     pymeos_initialize(utc)
