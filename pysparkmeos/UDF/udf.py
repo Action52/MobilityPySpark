@@ -300,6 +300,34 @@ def ever_intersects(
     return trip.ever_intersects(other)
 
 
+@F.udf(returnType = ArrayType(TGeomPointInstUDT()))
+def instants(tpoint, utc = "UTC"):
+    pymeos_initialize(utc)
+    return tpoint.instants()
+
+@F.udf(returnType = ArrayType(TGeomPointSeqUDT()))
+def sequences(tpoint, utc = "UTC"):
+    pymeos_initialize(utc)
+    return tpoint.sequences()
+
+@F.udf(returnType = TGeomPointInstUDT())
+def nearest_approach_instant(tpoint, other, utc = "UTC"):
+    pymeos_initialize(utc)
+    return tpoint.nearest_approach_instant(other)
+
+
+@F.udf(returnType = FloatType())
+def nearest_approach_distance(tpoint, other, utc = "UTC"):
+    pymeos_initialize(utc)
+    return tpoint.nearest_approach_distance(other)
+
+
+@F.udf(returnType = TFloatInstUDT())
+def distance(tpoint, other, utc = "UTC"):
+    pymeos_initialize(utc)
+    return tpoint.distance(other)
+
+
 @F.udf(returnType=FloatType())
 def min_distance(
         trip: TPoint,

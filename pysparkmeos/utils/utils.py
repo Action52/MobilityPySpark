@@ -33,7 +33,11 @@ def register_udfs_under_spark_sql(spark: SparkSession):
     spark.udf.register("num_instants", num_instants)
     spark.udf.register("length", length)
     spark.udf.register("geometry_values", geometry_values)
-
+    spark.udf.register("instants", instants)
+    spark.udf.register("sequences", sequences)
+    spark.udf.register("nearest_approach_instant", nearest_approach_instant)
+    spark.udf.register("nearest_approach_distance", nearest_approach_distance)
+    spark.udf.register("distance", distance)
 
 def register_udtfs_under_spark_sql(spark: SparkSession):
     """
