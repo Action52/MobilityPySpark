@@ -169,4 +169,78 @@ querytext15 = """
     WHERE atperiod = po.geom
 """
 
+## KNN Queries
+
+
+### Query 18: For each vehicle with a licence plate number from QueryLicences1 and each instant from QueryInstants1: Which are the 10 vehicles that have been closest to that vehicle at the given instant?
+querytext18 = """
+    WITH trip_instants AS (
+        SELECT t.vehid, t.tileid, t.movingobjectid, at_period(t.movingobject, timestamps(i.instant)[0]) AS tripatinstant
+        FROM trips t INNER JOIN instants i ON (i.tileid = t.tileid)
+        WHERE at_period(t.movingobject, timestamps(i.instant)[0]) IS NOT NULL
+    ),
+    distances AS (
+        SELECT 
+            ti1.vehid AS v1, ti2.vehid AS v2, ti1.movingobjectid AS mv1, ti2.movingobjectid AS mv2, 
+            ti1.tripatinstant AS tai1, ti2.tripatinstant tai2, nearest_approach_distance(ti1.tripatinstant, ti2.tripatinstant) AS nad
+        FROM trip_instants ti1 INNER JOIN trip_instants ti2 ON (
+            ti1.vehid != ti2.vehid
+        )
+        WHERE
+            nearest_approach_distance(ti1.tripatinstant, ti2.tripatinstant) != -1.0
+    ),
+    RankedDistances AS (
+        SELECT *,
+               ROW_NUMBER() OVER (PARTITION BY v1 ORDER BY nad) as rank
+        FROM distances
+    )
+    SELECT v1, v2, tai1, tai2, nad, rank
+    FROM RankedDistances
+    WHERE rank <= 10
+    ORDER BY v1, rank   
+"""
+
+
+### Query 20: For each region from QueryRegions1 and period from QueryPeriods1: What are the licences of the 10 vehicles that are closest to that region during the given observation period?
+querytext20 = """
+    WITH trip_periods AS (
+        SELECT 
+            t.vehid, 
+            t.tileid, 
+            p.periodid,
+            t.movingobjectid, 
+            at_period(t.movingobject, p.period) AS tripatperiod
+        FROM trips t LEFT JOIN periods p ON (t.tileid = p.tileid)
+    ),
+    distances AS (
+        SELECT
+            tp.tileid,
+            vehid, 
+            periodid, 
+            regionid, 
+            movingobjectid AS mvid, 
+            geom,
+            tripatperiod,
+            nearest_approach_distance(tripatperiod, geom) AS nad
+        FROM trip_periods tp LEFT JOIN regions r ON (tp.tileid = r.tileid)
+    ),
+    GroupedDistances AS (
+        SELECT regionid, periodid, vehid, MIN(nad) AS nad
+        FROM distances d
+        GROUP BY regionid, periodid, vehid
+        HAVING 
+            nad IS NOT NULL AND 
+            regionid IS NOT NULL AND
+            periodid IS NOT NULL
+        ORDER BY regionid, periodid, nad
+    ),
+    RankedDistances AS (
+        SELECT gd.*, v.licence, RANK(gd.vehid) OVER (PARTITION BY gd.regionid, periodid ORDER BY nad) AS rank
+        FROM GroupedDistances gd INNER JOIN vehicles v ON (gd.vehid = v.vehid)
+    )
+    SELECT * FROM RankedDistances
+    WHERE rank <= 10
+"""
+
+
 #q13, q13stats, plan13 = query_exec(querytext13, spark, explain=True)

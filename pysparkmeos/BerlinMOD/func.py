@@ -1,4 +1,4 @@
-from time import time
+from time import time, sleep
 import pandas as pd
 
 from pysparkmeos.utils.utils import bounds_calculate_map, \
@@ -15,6 +15,7 @@ def query_exec(query, spark, execute=True, explain=False, explainmode=''):
         result.show()
     end = time()
     print("Query execution time: ", end-start, " seconds.")
+    sleep(5)
     return result, (start, end, end-start), plan
 
 

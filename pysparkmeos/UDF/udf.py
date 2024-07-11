@@ -316,12 +316,6 @@ def nearest_approach_instant(tpoint, other, utc = "UTC"):
     return tpoint.nearest_approach_instant(other)
 
 
-@F.udf(returnType = FloatType())
-def nearest_approach_distance(tpoint, other, utc = "UTC"):
-    pymeos_initialize(utc)
-    return tpoint.nearest_approach_distance(other)
-
-
 @F.udf(returnType = TFloatInstUDT())
 def distance(tpoint, other, utc = "UTC"):
     pymeos_initialize(utc)
@@ -355,7 +349,7 @@ def nearest_approach_distance(
         trip: TPoint,
         other: Union[Geometry, STBox, TPoint],
         utc: str = "UTC"
-) -> float:
+) -> Union[float, None]:
     """
     Calculates the nearest approach distance between a TPoint and other.
     :param trip:
@@ -364,6 +358,8 @@ def nearest_approach_distance(
     :return:
     """
     pymeos_initialize(utc)
+    if trip is None or other is None:
+        return None
     return trip.nearest_approach_distance(other)
 
 
