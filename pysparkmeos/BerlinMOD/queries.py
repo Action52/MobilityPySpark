@@ -1,18 +1,18 @@
-### Query 1: What are the models of the vehicles with licence plate numbers from QueryLicences?
+querydesc1 = "Query 1: What are the models of the vehicles with licence plate numbers from QueryLicences?"
 querytext1 = """
     SELECT l.licence, v.model
     FROM licences l, vehicles v
     WHERE l.licence = v.licence
 """
 
-### Query 2: How many vehicles exist that are 'passenger' cars?
+querydesc2 = "Query 2: How many vehicles exist that are 'passenger' cars?"
 querytext2 = """
     SELECT COUNT(licence) AS PassengerCarCount
     FROM vehicles
     WHERE type='passenger'
 """
 
-### Query 3: Where have the vehicles with licences from QueryLicences1 been at each of the instants from QueryInstants1?
+querydesc3 = "Query 3: Where have the vehicles with licences from QueryLicences1 been at each of the instants from QueryInstants1?"
 querytext3 = """
     WITH
     veh_w_lic AS (
@@ -25,12 +25,13 @@ querytext3 = """
         FROM veh_w_lic vw, trips t
         WHERE t.vehid = vw.vehid
     )
-    SELECT vt.vehid, vt.movingobjectid, vt.movingobject, i.instant, tpoint_at(vt.movingobject, i.instant) AS pos
-    FROM veh_trips vt INNER JOIN instants i ON i.tileid=vt.tileid
-    WHERE tpoint_at(vt.movingobject, i.instant) IS NOT NULL
+    SELECT vt.vehid, vt.movingobjectid, vt.movingobject, i.instantid, i.instant, tpoint_at(vt.movingobject, i.instant) AS pos
+    FROM veh_trips vt RIGHT JOIN instants i ON i.tileid=vt.tileid
+    WHERE vehid IS NOT NULL AND tpoint_at(vt.movingobject, i.instant) IS NOT NULL
+    ORDER BY vehid, instantid
 """
 
-### Query 4: Which licence plate numbers belong to vehicles that have passed the points from QueryPoints?
+querydesc4 = "Query 4: Which licence plate numbers belong to vehicles that have passed the points from QueryPoints?"
 querytext4 = """
     WITH
 
@@ -44,7 +45,7 @@ querytext4 = """
     FROM vehids_intersect vi INNER JOIN vehicles v ON (vi.vehid=v.vehid)
 """
 
-### Query 5: What is the minimum distance between places, where a vehicle with a licence from QueryLicences1 and a vehicle with a licence from QueryLicences2 have been?
+querydesc5 = "Query 5: What is the minimum distance between places, where a vehicle with a licence from QueryLicences1 and a vehicle with a licence from QueryLicences2 have been?"
 querytext5 = """
     WITH ql1vehids AS (
         SELECT vehicles.licence, vehicles.vehid 
@@ -92,7 +93,7 @@ querytext5 = """
     GROUP BY t1licence, t2licence, t1tripid, t2tripid
 """
 
-### Query 6: What are the pairs of licence plate numbers of “trucks”, that have ever been as close as 10m or less to each other?
+querydesc6 = "Query 6: What are the pairs of licence plate numbers of “trucks”, that have ever been as close as 10m or less to each other?"
 querytext6 = """
     WITH trucks AS (
         SELECT vehid, licence
@@ -111,7 +112,7 @@ querytext6 = """
     ORDER BY licence_pairs DESC
 """
 
-### Query 11: Query 11 Which vehicles passed a point from QueryPoints1 at one of the instants from QueryInstants1?
+querydesc11 = "Query 11: Query 11 Which vehicles passed a point from QueryPoints1 at one of the instants from QueryInstants1?"
 querytext11 = """
     WITH atinstants AS (
         SELECT t.vehid, t.movingobjectid, tpoint_at(t.movingobject, i.instant, TRUE) AS atinstant, t.tileid
@@ -126,7 +127,7 @@ querytext11 = """
     SELECT DISTINCT vehid FROM atpoints
 """
 
-### Query 12: Which vehicles met at a point from QueryPoints1 at an instant from QueryInstants1?
+querydesc12 = "Query 12: Which vehicles met at a point from QueryPoints1 at an instant from QueryInstants1?"
 querytext12 = """
     WITH instants_ts AS (
         SELECT instants.instantid, timestamps(instants.instant)[0] AS ts, instants.tileid
@@ -142,7 +143,7 @@ querytext12 = """
     WHERE ai.atinstant = p.geom
 """
 
-### Query 13: Which vehicles travelled within one of the regions from QueryRegions1 during the periods from QueryPeriods1?
+querydesc13 = "Query 13: Which vehicles travelled within one of the regions from QueryRegions1 during the periods from QueryPeriods1?"
 querytext13 = """
     WITH atperiods AS (
         SELECT t.vehid, t.movingobjectid, at_period(t.movingobject, p.period) AS atperiod, t.tileid
@@ -157,7 +158,7 @@ querytext13 = """
     SELECT DISTINCT vehid FROM intersections
 """
 
-### Query 15: Which vehicles passed a point from QueryPoints1 during a period from QueryPeriods1?
+querydesc15 = "Query 15: Which vehicles passed a point from QueryPoints1 during a period from QueryPeriods1?"
 querytext15 = """
     WITH atperiods AS (
         SELECT t.vehid, t.movingobjectid, explode(geometry_values(at_period(t.movingobject, p.period))) AS atperiod, t.tileid
@@ -172,7 +173,7 @@ querytext15 = """
 ## KNN Queries
 
 
-### Query 18: For each vehicle with a licence plate number from QueryLicences1 and each instant from QueryInstants1: Which are the 10 vehicles that have been closest to that vehicle at the given instant?
+querydesc18 = "Query 18: For each vehicle with a licence plate number from QueryLicences1 and each instant from QueryInstants1: Which are the 10 vehicles that have been closest to that vehicle at the given instant?"
 querytext18 = """
     WITH trip_instants AS (
         SELECT t.vehid, t.tileid, t.movingobjectid, at_period(t.movingobject, timestamps(i.instant)[0]) AS tripatinstant
@@ -201,7 +202,7 @@ querytext18 = """
 """
 
 
-### Query 20: For each region from QueryRegions1 and period from QueryPeriods1: What are the licences of the 10 vehicles that are closest to that region during the given observation period?
+querydesc20 = "Query 20: For each region from QueryRegions1 and period from QueryPeriods1: What are the licences of the 10 vehicles that are closest to that region during the given observation period?"
 querytext20 = """
     WITH trip_periods AS (
         SELECT 

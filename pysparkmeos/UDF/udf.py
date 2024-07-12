@@ -208,6 +208,8 @@ def tpoint_at(
     :return:
     """
     pymeos_initialize(utc)
+    if trip is None or instant is None:
+        return None
     tripat = trip.at(instant.timestamp())
     if tripat:
         if return_start_value:

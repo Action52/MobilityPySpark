@@ -5,8 +5,9 @@ from pysparkmeos.utils.utils import bounds_calculate_map, \
     bounds_calculate_reduce
 
 
-def query_exec(query, spark, execute=True, explain=False, explainmode=''):
+def query_exec(query, desc, spark, execute=True, explain=False, explainmode=''):
     plan = None
+    print(desc)
     if explain:
         plan = spark.sql(f"EXPLAIN {explainmode} {query}").collect()[0].plan
     result = spark.sql(query)
@@ -23,15 +24,15 @@ def retrieve_exec_stats(queries, starts, ends, durations, plans):
     return pd.DataFrame({"queries": queries, "start": starts, "end": ends, "duration": durations, "plan": plans})
 
 
-def run_all_queries(queries, spark, execute=True, explain=True, explainmode='', printplan=False):
+def run_all_queries(queries, descs, spark, execute=True, explain=True, explainmode='', printplan=False):
     """ Utility function to run all queries through subsequent experiments """
     qdfs = []
     starts = []
     ends = []
     durations = []
     plans = []
-    for querytext in queries:
-        qdf, qstats, plan = query_exec(querytext, spark, execute, explain, explainmode)
+    for querytext, querydesc in zip(queries, descs):
+        qdf, qstats, plan = query_exec(querytext, querydesc, spark, execute, explain, explainmode)
         qdfs.append(qdf)
         starts.append(qstats[0])
         ends.append(qstats[1])
