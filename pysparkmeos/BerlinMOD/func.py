@@ -147,11 +147,11 @@ def load_table(
     return df, (start, end, end - start)
 
 
-def load_all_tables(spark, paths, configs, sample_percent=1):
+def load_all_tables(spark, configs, sample_percent=1):
     tables = {}
     stats = {}
     for tablename, config in configs.items():
-        table, stat = load_table(path=paths[tablename], **config)
+        table, stat = load_table(**config)
         tables[tablename] = table
         stats[tablename] = stat
 
