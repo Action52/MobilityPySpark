@@ -505,7 +505,7 @@ def num_instants(traj: TPoint, utc="UTC"):
 
 
 @F.udf(returnType=FloatType())
-def length(traj: TPoint, utc="UTC"):
+def tlength(traj: TPoint, utc="UTC"):
     pymeos_initialize(utc)
     return traj.length()
 
