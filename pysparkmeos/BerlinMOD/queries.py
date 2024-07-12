@@ -150,7 +150,7 @@ querytext13 = """
         FROM atperiods atp RIGHT JOIN regions r ON (atp.tileid=r.tileid)
         WHERE at_geom(atp.atperiod, r.geom) IS NOT NULL
     )
-    SELECT regionid, periodid, collect_list(DISTINCT vehid) AS vehids 
+    SELECT regionid, periodid, collect_list(vehid) AS vehids 
     FROM intersections
     GROUP BY regionid, periodid
     ORDER BY regionid, periodid
@@ -173,9 +173,19 @@ querytext15 = """
 
 querydesc18 = "Query 18: For each vehicle with a licence plate number from QueryLicences1 and each instant from QueryInstants1: Which are the 10 vehicles that have been closest to that vehicle at the given instant?"
 querytext18 = """
-    WITH trip_instants AS (
+    WITH ql1vehids AS (
+        SELECT vehicles.licence, vehicles.vehid 
+        FROM vehicles, querylicences1
+        WHERE vehicles.licence = querylicences1.licence   
+    ),
+    ql1trips AS (
+        SELECT ql1vehids.licence, trips.movingobject, trips.movingobjectid, trips.vehid, trips.tileid
+        FROM trips, ql1vehids
+        WHERE trips.vehid = ql1vehids.vehid
+    ),
+    trip_instants AS (
         SELECT t.vehid, t.tileid, t.movingobjectid, at_period(t.movingobject, timestamps(i.instant)[0]) AS tripatinstant
-        FROM trips t INNER JOIN instants i ON (i.tileid = t.tileid)
+        FROM ql1trips t INNER JOIN instants i ON (i.tileid = t.tileid)
         WHERE at_period(t.movingobject, timestamps(i.instant)[0]) IS NOT NULL
     ),
     distances AS (
