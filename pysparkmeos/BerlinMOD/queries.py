@@ -38,7 +38,7 @@ querytext4 = """
         WHERE 
             ever_intersects(t.movingobject, p.geom) = TRUE
     )
-    SELECT DISTINCT vi.vehid, v.licence
+    SELECT vi.vehid, v.licence
     FROM vehids_intersect vi INNER JOIN vehicles v ON (vi.vehid=v.vehid)
 """
 
