@@ -299,6 +299,8 @@ def ever_intersects(
     :return:
     """
     pymeos_initialize(utc)
+    if trip is None or other is None:
+        return None
     return trip.ever_intersects(other)
 
 
@@ -406,7 +408,7 @@ def tgeompointseq(
 @F.udf(returnType=TGeomPointSeqSetUDT())
 def at_geom(trip: TPoint, geom: Geometry, utc: str = "UTC") -> TGeomPointSeqSet:
     pymeos_initialize(utc)
-    if trip is None:
+    if trip is None or geom is None:
         return None
     at = trip.at(geom)
     if at:
@@ -416,7 +418,7 @@ def at_geom(trip: TPoint, geom: Geometry, utc: str = "UTC") -> TGeomPointSeqSet:
 @F.udf(returnType=TGeomPointSeqSetUDT())
 def at_period(trip: TPoint, period: TsTzSpan, utc: str = "UTC") -> TGeomPointSeqSet:
     pymeos_initialize(utc)
-    if trip is None:
+    if trip is None or period is None:
         return None
     at = trip.at(period)
     if at:

@@ -1,7 +1,7 @@
 querydesc1 = "Query 1: What are the models of the vehicles with licence plate numbers from QueryLicences?"
 querytext1 = """
     SELECT l.licence, v.model
-    FROM licences l, vehicles v
+    FROM querylicences1 l, vehicles v
     WHERE l.licence = v.licence
 """
 
@@ -17,15 +17,14 @@ querytext3 = """
     WITH
     veh_w_lic AS (
         SELECT v.vehid, l.licence, v.model
-        FROM licences l, vehicles v
+        FROM querylicences1 l, vehicles v
         WHERE l.licence = v.licence
     ),
     veh_trips AS (
-        SELECT t.* 
-        FROM veh_w_lic vw, trips t
-        WHERE t.vehid = vw.vehid
+        SELECT t.vehid, t.tileid, t.movingobjectid, t.movingobject, vw.licence, vw.model
+        FROM veh_w_lic vw INNER JOIN trips t ON (t.vehid=vw.vehid)
     )
-    SELECT vt.vehid, vt.movingobjectid, vt.movingobject, i.instantid, i.instant, tpoint_at(vt.movingobject, i.instant) AS pos
+    SELECT vt.vehid, licence, i.instantid, tpoint_at(vt.movingobject, i.instant) AS pos
     FROM veh_trips vt RIGHT JOIN instants i ON i.tileid=vt.tileid
     WHERE vehid IS NOT NULL AND tpoint_at(vt.movingobject, i.instant) IS NOT NULL
     ORDER BY vehid, instantid
@@ -33,15 +32,13 @@ querytext3 = """
 
 querydesc4 = "Query 4: Which licence plate numbers belong to vehicles that have passed the points from QueryPoints?"
 querytext4 = """
-    WITH
-
-    vehids_intersect AS (
+    WITH vehids_intersect AS (
         SELECT t.vehid
         FROM trips t INNER JOIN points p ON (t.tileid=p.tileid)
         WHERE 
             ever_intersects(t.movingobject, p.geom) = TRUE
     )
-    SELECT vi.vehid, v.licence
+    SELECT DISTINCT vi.vehid, v.licence
     FROM vehids_intersect vi INNER JOIN vehicles v ON (vi.vehid=v.vehid)
 """
 
@@ -86,11 +83,9 @@ querytext5 = """
     SELECT 
         t1licence,
         t2licence,
-        t1tripid,
-        t2tripid,
         MIN(min_dist)
     FROM distances
-    GROUP BY t1licence, t2licence, t1tripid, t2tripid
+    GROUP BY t1licence, t2licence
 """
 
 querydesc6 = "Query 6: What are the pairs of licence plate numbers of “trucks”, that have ever been as close as 10m or less to each other?"
@@ -114,18 +109,19 @@ querytext6 = """
 
 querydesc11 = "Query 11: Query 11 Which vehicles passed a point from QueryPoints1 at one of the instants from QueryInstants1?"
 querytext11 = """
-    WITH atinstants AS (
-        SELECT t.vehid, t.movingobjectid, tpoint_at(t.movingobject, i.instant, TRUE) AS atinstant, t.tileid
-        FROM trips t INNER JOIN instants i ON (t.tileid=i.tileid)
-        WHERE tpoint_at(t.movingobject, i.instant, TRUE) IS NOT NULL
-    ),
-    atpoints AS (
-        SELECT t.vehid, t.movingobjectid, ever_intersects(t.movingobject, ati.atinstant) AS atpoint, t.tileid
-        FROM trips t INNER JOIN atinstants ati ON (t.tileid=ati.tileid)
-        WHERE ever_intersects(t.movingobject, ati.atinstant) = TRUE
+    WITH atinstantspoints AS (
+        SELECT t.vehid, p.pointid, i.instantid, t.movingobjectid, tpoint_at(t.movingobject, i.instant, TRUE) AS atinstant, t.tileid
+        FROM trips t INNER JOIN instants i ON (t.tileid=i.tileid) INNER JOIN points p ON (t.tileid = p.tileid)
+        WHERE 
+            tpoint_at(t.movingobject, i.instant, TRUE) IS NOT NULL AND 
+            tpoint_at(t.movingobject, i.instant, TRUE) = p.geom
     )
-    SELECT DISTINCT vehid FROM atpoints
+    SELECT instantid, pointid, collect_list(DISTINCT vehid) AS vehids
+    FROM atinstantspoints
+    GROUP BY instantid, pointid
+    ORDER BY instantid, pointid
 """
+
 
 querydesc12 = "Query 12: Which vehicles met at a point from QueryPoints1 at an instant from QueryInstants1?"
 querytext12 = """
@@ -146,16 +142,18 @@ querytext12 = """
 querydesc13 = "Query 13: Which vehicles travelled within one of the regions from QueryRegions1 during the periods from QueryPeriods1?"
 querytext13 = """
     WITH atperiods AS (
-        SELECT t.vehid, t.movingobjectid, at_period(t.movingobject, p.period) AS atperiod, t.tileid
-        FROM trips t INNER JOIN periods p ON (t.tileid=p.tileid)
-        WHERE at_period(t.movingobject, p.period) IS NOT NULL
+        SELECT t.vehid, p.periodid, t.movingobjectid, at_period(t.movingobject, p.period) AS atperiod, t.tileid
+        FROM trips t RIGHT JOIN periods p ON (t.tileid=p.tileid)
     ),
     intersections AS (
-        SELECT atp.vehid, atp.movingobjectid, at_geom(atp.atperiod, r.geom) AS atgeom
-        FROM atperiods atp INNER JOIN regions r ON (atp.tileid=r.tileid)
+        SELECT r.regionid, atp.periodid, atp.vehid, atp.movingobjectid, at_geom(atp.atperiod, r.geom) AS atgeom
+        FROM atperiods atp RIGHT JOIN regions r ON (atp.tileid=r.tileid)
         WHERE at_geom(atp.atperiod, r.geom) IS NOT NULL
     )
-    SELECT DISTINCT vehid FROM intersections
+    SELECT regionid, periodid, collect_list(DISTINCT vehid) AS vehids 
+    FROM intersections
+    GROUP BY regionid, periodid
+    ORDER BY regionid, periodid
 """
 
 querydesc15 = "Query 15: Which vehicles passed a point from QueryPoints1 during a period from QueryPeriods1?"

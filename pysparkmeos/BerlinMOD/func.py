@@ -147,7 +147,7 @@ def load_table(
     return df, (start, end, end - start)
 
 
-def load_all_tables(spark, configs, sample_percent=1):
+def load_all_tables(spark, configs, sample_percent=0.01):
     tables = {}
     stats = {}
     for tablename, config in configs.items():
@@ -155,16 +155,10 @@ def load_all_tables(spark, configs, sample_percent=1):
         tables[tablename] = table
         stats[tablename] = stat
 
-    querylicences1 = spark.sql(f"""
-    SELECT licence
-    FROM vehicles TABLESAMPLE ({sample_percent} PERCENT)
-    """)
+    querylicences1 = spark.table("vehicles").sample(fraction=sample_percent, seed=3)
     querylicences1.cache().createOrReplaceTempView("querylicences1")
 
-    querylicences2 = spark.sql(f"""
-    SELECT licence
-    FROM vehicles TABLESAMPLE ({sample_percent} PERCENT)
-    """)
+    querylicences2 = spark.table("vehicles").sample(fraction=sample_percent, seed=7)
     querylicences2.cache().createOrReplaceTempView("querylicences2")
 
     return tables, stats
