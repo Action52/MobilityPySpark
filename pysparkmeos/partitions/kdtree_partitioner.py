@@ -74,7 +74,7 @@ class KDTreePartition(MobilityPartitioner):
 
         # Sort the generator
         movingobjects = sorted(movingobjects, key=lambda p: from_axis(p, axis))
-        num_points = sum(1 for _ in movingobjects)
+        num_points = len(movingobjects)
 
         if depth == max_depth or num_points <= 1:
             tiles.append(bounds)

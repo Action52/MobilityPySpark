@@ -72,6 +72,7 @@ transpointssimple = """
                 FROM pointsRawNoCache
 """
 
+
 transregions = """
     SELECT * 
     FROM RegionsUDTF(
@@ -108,6 +109,33 @@ transtrips = """
     FROM tripsRawNoCache
 """
 
+transtrips2 = """
+    WITH instants AS (
+        SELECT 
+            vehid,
+            tripid,
+            seqno,
+            tgeompointinst(
+                        geometry_from_hexwkb(point), 
+                        tboolinst_from_base_time(date_trunc("second", t), TRUE)
+            ) AS tpoint,
+            t
+        FROM tripsRawNoCache
+    )
+    SELECT 
+        tripid, 
+        vehid,
+        NULL AS day,
+        seqno,
+        NULL AS sourcenode,
+        NULL AS targetnode,
+        tgeompointseq_from_tpoint_list(collect_set(tpoint)) AS trip,
+        NULL AS trajectory,
+        NULL AS licence
+    FROM instants
+    GROUP BY vehid, tripid, seqno
+"""
+
 transtripssimple = """
     SELECT 
         tripid AS movingobjectid, 
@@ -121,4 +149,56 @@ transtripssimple = """
         licence,
         -1 AS tileid
     FROM tripsRawNoCache
+"""
+
+transtripssimple2 = """
+    WITH instants AS (
+        SELECT 
+            vehid,
+            tripid,
+            seqno,
+            tgeompointinst(
+                        geometry_from_hexwkb(point), 
+                        tboolinst_from_base_time(date_trunc("second", t), TRUE)
+            ) AS tpoint,
+            t
+        FROM tripsRawNoCache
+    )
+    SELECT 
+        tripid AS movingobjectid, 
+        vehid, 
+        NULL AS day, 
+        seqno, 
+        NULL AS sourcenode, 
+        NULL AS targetnode, 
+        tgeompointseq_from_tpoint_list(collect_set(tpoint)) AS movingobject, 
+        NULL AS trajectory, 
+        NULL AS licence,
+        -1 AS tileid
+    FROM instants
+    GROUP BY vehid, tripid, seqno
+"""
+
+transmunsimple = """
+    SELECT 
+        municipalityid,
+        name,
+        geometry_from_wkt(geom) AS geom,
+        -1 AS tileid
+        FROM municipalitiesRawNoCache
+"""
+
+transmun = """
+    SELECT * 
+    FROM MunicipalitiesUDTF(
+        TABLE(
+                SELECT 
+                    name,
+                    municipalityid AS trajectory_id,
+                    geometry_from_wkt(geom) AS movingobject, 
+                    (SELECT collect_list(tile) FROM grid) AS tiles, 
+                    (SELECT collect_list(tileid) FROM grid) AS tileids
+                FROM municipalitiesRawNoCache
+        )
+    )
 """

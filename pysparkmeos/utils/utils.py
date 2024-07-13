@@ -4,6 +4,8 @@ from pysparkmeos.UDTF import *
 
 from pymeos import *
 
+from pysparkmeos.UDTF.BerlinMOD.municipalities_udtf import MunicipalitiesUDTF
+
 
 def register_udfs_under_spark_sql(spark: SparkSession):
     """
@@ -38,6 +40,9 @@ def register_udfs_under_spark_sql(spark: SparkSession):
     spark.udf.register("nearest_approach_instant", nearest_approach_instant)
     spark.udf.register("nearest_approach_distance", nearest_approach_distance)
     spark.udf.register("distance", distance)
+    spark.udf.register("tgeompointseq_from_tpoint_list", tgeompointseq_from_tpoint_list)
+    spark.udf.register("geometry_from_wkt", geometry_from_wkt)
+
 
 def register_udtfs_under_spark_sql(spark: SparkSession):
     """
@@ -50,6 +55,7 @@ def register_udtfs_under_spark_sql(spark: SparkSession):
     spark.udtf.register("PointsUDTF", PointsUDTF)
     spark.udtf.register("PeriodsUDTF", PeriodsUDTF)
     spark.udtf.register("InstantsUDTF", InstantsUDTF)
+    spark.udtf.register("MunicipalitiesUDTF", MunicipalitiesUDTF)
 
 
 def bounds_calculate_map(

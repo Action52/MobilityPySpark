@@ -17,7 +17,8 @@ def load_config(
         'periods':  {},
         'points':   {},
         'regions':  {},
-        'vehicles': {}
+        'vehicles': {},
+        'municipalities': {}
     }
     if paths:
         for pathkey, path in paths.items():

@@ -11,6 +11,7 @@ from shapely import wkb, Geometry
 
 from typing import *
 from datetime import datetime
+from shapely import from_wkt
 
 
 @F.udf(returnType=TGeomPointInstUDT())
@@ -534,6 +535,33 @@ def spatial_values(traj, dim, utc='UTC'):
         return traj.y().values()
     if dim == 'z':
         return traj.z().values()
+
+
+@F.udf(returnType=TGeomPointSeqUDT())
+def tgeompointseq_from_tpoint_list(tpoints, utc="UTC"):
+    pymeos_initialize(utc)
+
+    tpoints = sorted(tpoints, key=lambda x: x.start_timestamp())
+    ts = set()
+    final_tpoints = []
+    for tpoint in tpoints:
+        t = str(tpoint.start_timestamp())
+        if t in ts:
+            continue
+        else:
+            ts.add(t)
+            final_tpoints.append(tpoint)
+    try:
+        tgeompointseq = TGeomPointSeq(instant_list=final_tpoints)
+        return tgeompointseq
+    except:
+        return None
+
+
+@F.udf(returnType=GeometryUDT())
+def geometry_from_wkt(geom):
+    geom = geom.strip("SRID=3857;")
+    return from_wkt(geom)
 
 
 def main():
