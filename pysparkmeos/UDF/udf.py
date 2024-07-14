@@ -536,23 +536,14 @@ def spatial_values(traj, dim, utc='UTC'):
     if dim == 'z':
         return traj.z().values()
 
-
+import pandas as pd
 @F.udf(returnType=TGeomPointSeqUDT())
 def tgeompointseq_from_tpoint_list(tpoints, utc="UTC"):
     pymeos_initialize(utc)
-
-    tpoints = sorted(tpoints, key=lambda x: x.start_timestamp())
-    ts = set()
-    final_tpoints = []
-    for tpoint in tpoints:
-        t = str(tpoint.start_timestamp())
-        if t in ts:
-            continue
-        else:
-            ts.add(t)
-            final_tpoints.append(tpoint)
+    tpoints = pd.DataFrame(tpoints, columns=['point', 'ts']).drop_duplicates(subset=['ts']).sort_values(by="ts")
+    tpoints['tpoint'] = tpoints.apply(lambda x: TGeomPointInst(point=x['point'], timestamp=x['ts']), axis=1)
     try:
-        tgeompointseq = TGeomPointSeq(instant_list=final_tpoints)
+        tgeompointseq = TGeomPointSeq(instant_list=tpoints['tpoint'])
         return tgeompointseq
     except:
         return None

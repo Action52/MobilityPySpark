@@ -115,10 +115,7 @@ transtrips2 = """
             vehid,
             tripid,
             seqno,
-            tgeompointinst(
-                        geometry_from_hexwkb(point), 
-                        tboolinst_from_base_time(date_trunc("second", t), TRUE)
-            ) AS tpoint,
+            array(point, date_trunc("second", t)) AS tpoint,
             t
         FROM tripsRawNoCache
     )
@@ -129,7 +126,7 @@ transtrips2 = """
         seqno,
         NULL AS sourcenode,
         NULL AS targetnode,
-        tgeompointseq_from_tpoint_list(collect_set(tpoint)) AS trip,
+        tgeompointseq_from_tpoint_list(collect_list(tpoint)) AS trip,
         NULL AS trajectory,
         NULL AS licence
     FROM instants
@@ -157,10 +154,7 @@ transtripssimple2 = """
             vehid,
             tripid,
             seqno,
-            tgeompointinst(
-                        geometry_from_hexwkb(point), 
-                        tboolinst_from_base_time(date_trunc("second", t), TRUE)
-            ) AS tpoint,
+            array(point, date_trunc("second", t)) AS tpoint,
             t
         FROM tripsRawNoCache
     )
@@ -171,7 +165,7 @@ transtripssimple2 = """
         seqno, 
         NULL AS sourcenode, 
         NULL AS targetnode, 
-        tgeompointseq_from_tpoint_list(collect_set(tpoint)) AS movingobject, 
+        tgeompointseq_from_tpoint_list(collect_list(tpoint)) AS movingobject, 
         NULL AS trajectory, 
         NULL AS licence,
         -1 AS tileid

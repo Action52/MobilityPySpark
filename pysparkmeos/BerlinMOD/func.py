@@ -76,9 +76,9 @@ def load_table(
         rawdf = spark.sql(transformation_query)
         # rawdf.show()
         rawdf.createOrReplaceTempView(f"{tablename}RawNoCache")
-        spark.sql(
-            f"CACHE TABLE {tablename}Raw SELECT * FROM {tablename}RawNoCache")
-        spark.sql(f"SELECT * FROM {tablename}Raw LIMIT 5").show()
+        rawdf.createOrReplaceTempView(f"{tablename}Raw")
+        #spark.sql(f"CACHE TABLE {tablename}Raw SELECT * FROM {tablename}RawNoCache")
+        #spark.sql(f"SELECT * FROM {tablename}Raw LIMIT 5").show()
         # spark.catalog.dropTempView(f"{tablename}RawNoCache")
     else:
         spark.sql(
