@@ -161,13 +161,13 @@ transtripssimple2 = """
     SELECT 
         tripid AS movingobjectid, 
         vehid, 
-        NULL AS day, 
+        -1 AS day, 
         seqno, 
-        NULL AS sourcenode, 
-        NULL AS targetnode, 
+        -1 AS sourcenode, 
+        -1 AS targetnode, 
         tgeompointseq_from_tpoint_list(collect_list(tpoint)) AS movingobject, 
-        NULL AS trajectory, 
-        NULL AS licence,
+        -1 AS trajectory, 
+        -1 AS licence,
         -1 AS tileid
     FROM instants
     GROUP BY vehid, tripid, seqno
