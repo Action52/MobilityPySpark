@@ -72,7 +72,7 @@ class KDTreePartitionSpark(MobilityPartitioner):
             ),
             '{bounds.__str__()}'
         )
-        """).cache()
+        """)
 
         if instants_at.isEmpty():
             return tiles
