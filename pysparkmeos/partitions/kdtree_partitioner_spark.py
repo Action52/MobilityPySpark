@@ -72,7 +72,7 @@ class KDTreePartitionSpark(MobilityPartitioner):
             ),
             '{bounds.__str__()}'
         )
-        """)
+        """).cache()
 
         if instants_at.isEmpty():
             return tiles
@@ -81,50 +81,32 @@ class KDTreePartitionSpark(MobilityPartitioner):
             tiles.append(bounds)
         else:
             if dim == 't':
-                # mediandim = instants_at.agg(F.median("ts")).collect()[0]['median(ts)']
-                # mediandim = instants_at.approxQuantile("rowNo", [0.5], 1)[0]
-                rdd = instants_at.rdd.mapPartitionsWithIndex(
-                    lambda i, x: KDTreePartitionSpark.partition_median_index(i,
-                                                                             x,
-                                                                             dim='ts',
-                                                                             rowcol='rowNo')
-                )
-                medians = [median for median in rdd.toLocalIterator() if
-                           median[1]]
-                medians = sorted(medians, key=lambda x: x[1])
-                median_index = len(medians) // 2
-                median = medians[median_index]
-                medianrow = median[1][1]
-                # print(f"Found median row: {medianrow} for dim {dim} level {depth}.")
-                lower = instants_at.where(f'rowNo<={medianrow}')
-                upper = instants_at.where(f'rowNo>{medianrow}')
-                midrow = instants_at.where(f'rowNo={medianrow}').first()
-            else:
-                # mediandim = instants_at.agg(F.median(dim)).collect()[0][f'median({dim})']
-                # mediandim = instants_at.approxQuantile("rowNo", [0.5], 1)[0]
-                rdd = instants_at.select(dim,
-                                         "rowNo").rdd.mapPartitionsWithIndex(
+                dim = 'ts'
+            # mediandim = instants_at.agg(F.median("ts")).collect()[0]['median(ts)']
+            # mediandim = instants_at.approxQuantile("rowNo", [0.5], 1)[0]
+            rdd = instants_at.rdd.mapPartitionsWithIndex(
                     lambda i, x: KDTreePartitionSpark.partition_median_index(i,
                                                                              x,
                                                                              dim=dim,
                                                                              rowcol='rowNo')
-                )
-                medians = [median for median in rdd.toLocalIterator() if
+            )
+            medians = [median for median in rdd.toLocalIterator() if
                            median[1]]
-                medians = sorted(medians, key=lambda x: x[1])
-                median_index = len(medians) // 2
-                median = medians[median_index]
-                medianrow = median[1][1]
-                # print(f"Found median row: {medianrow} for dim {dim} level {depth}.")
-                lower = instants_at.where(f'rowNo<={medianrow}')
-                upper = instants_at.where(f'rowNo>{medianrow}')
-                midrow = instants_at.where(f'rowNo={medianrow}').first()
-
+            medians = sorted(medians, key=lambda x: x[1])
+            median_index = len(medians) // 2
+            median = medians[median_index]
+            medianrow = median[1][1]
+            # print(f"Found median row: {medianrow} for dim {dim} level {depth}.")
+            lower = instants_at.where(f'rowNo<={medianrow}')
+            upper = instants_at.where(f'rowNo>{medianrow}')
+            midrow = median[1][2][traj_colname]
+            if dim == 'ts':
+                dim = 't'
             bboxleft = STBoxWrap(
-                new_bounds_from_axis(bounds, dim, midrow[traj_colname],
+                new_bounds_from_axis(bounds, dim, midrow,
                                      "left").__str__())
             bboxright = STBoxWrap(
-                new_bounds_from_axis(bounds, dim, midrow[traj_colname],
+                new_bounds_from_axis(bounds, dim, midrow,
                                      "right").__str__())
 
             left = KDTreePartitionSpark._generate_grid(spark, lower,
@@ -152,16 +134,13 @@ class KDTreePartitionSpark(MobilityPartitioner):
         median_index = 0
         values = []
         for i, row in enumerate(rows):
-            if dim == 'x':
-                rowdim = row.x
-
             median_index = i // 2
-            values.append((row[dim], row.rowNo,))
+            values.append((row[dim], row.rowNo, row))
         if values:
             values = sorted(values, key=lambda x: x[0])
             return [(idx, values[median_index])]
         else:
-            return [(idx, None,)]
+            return [(idx, None, None,)]
 
     def num_partitions(self) -> int:
         """Return the total number of partitions."""
