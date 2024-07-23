@@ -11,7 +11,13 @@ setup(
     author_email='leonvillapun@gmail.com',
     url='https://github.com/yourusername/pysparkmeos',
     install_requires=[
-        'pymeos'
+        'pymeos',
+        'contextily==1.6.0',
+        'distinctipy==1.3.4',
+        'pandas==2.2.2',
+        'pyspark==3.5.1',
+        'geopandas==0.14.4',
+        'matplotlib'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

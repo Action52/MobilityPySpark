@@ -97,7 +97,7 @@ class KDTreePartitionSpark(MobilityPartitioner):
             median = medians[median_index]
             medianrow = median[1][1]
             # print(f"Found median row: {medianrow} for dim {dim} level {depth}.")
-            lower = instants_at.where(f'rowNo<{medianrow}')
+            lower = instants_at.where(f'rowNo<={medianrow}')
             upper = instants_at.where(f'rowNo>{medianrow}')
             midrow = median[1][2][traj_colname]
             if dim == 'ts':

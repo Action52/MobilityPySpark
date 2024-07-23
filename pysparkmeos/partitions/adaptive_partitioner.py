@@ -1,12 +1,8 @@
-import math
-
-from pysparkmeos.partitions.grid.grid_partitioner import GridPartition
 from pysparkmeos.partitions.mobility_partitioner import MobilityPartitioner
-from pysparkmeos.utils.utils import new_bounds_from_axis, from_axis, new_bounds
+from pysparkmeos.utils.utils import new_bounds
 from typing import *
 from pymeos import *
 from pymeos import TPoint
-import numpy as np
 import pandas as pd
 import itertools
 
