@@ -17,7 +17,8 @@ setup(
         'pandas==2.2.2',
         'pyspark==3.5.1',
         'geopandas==0.14.4',
-        'matplotlib'
+        'matplotlib',
+        'jupyter'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
