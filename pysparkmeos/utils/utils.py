@@ -75,7 +75,7 @@ def bounds_calculate_map(
     aggregator = TemporalPointExtentAggregator.start_aggregation()
     for row in partition_rows:
         if type(row) == Row:
-            seq = TGeomPointSeq(row[colname].__str__())
+            seq = row[colname] #TGeomPointSeq(row[colname].__str__())
             aggregator.add(seq)
     try:
         boundbox = STBoxWrap(aggregator.aggregation().__str__())
