@@ -7,20 +7,17 @@ from pysparkmeos.UDT.MeosDatatype import *
 from typing import *
 
 
-@F.udtf(returnType=StructType([
-    StructField("tileid", IntegerType()),
-    StructField("tile", STBoxUDT())
-]))
+@F.udtf(
+    returnType=StructType(
+        [StructField("tileid", IntegerType()), StructField("tile", STBoxUDT())]
+    )
+)
 class GridUDTF:
     """
     Class to create a Spark dataframe containing the tiles and the tileids.
     """
-    def eval(
-            self,
-            tilesstr: List[str],
-            col_dict={},
-            utc_time: str = "UTC"
-    ):
+
+    def eval(self, tilesstr: List[str], col_dict={}, utc_time: str = "UTC"):
         """
         :param tilesstr: List of STBox strings representing the tiles
         :param col_dict: Dictionary to handle column names when using rows.

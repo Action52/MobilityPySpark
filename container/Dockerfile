@@ -25,7 +25,7 @@ RUN git clone https://github.com/MobilityDB/MobilityDB.git -b v1.1.0 --depth 1 /
     && make install
 
 # Clone and set up PysparkMobility
-RUN git clone https://github.com/Action52/PysparkMobility.git /data/PysparkMobility
+RUN git clone https://github.com/Action52/PysparkMobility.git -b v0.1 /data/PysparkMobility
 
 RUN pip3 install /data/PysparkMobility/
 

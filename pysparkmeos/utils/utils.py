@@ -59,9 +59,7 @@ def register_udtfs_under_spark_sql(spark: SparkSession):
 
 
 def bounds_calculate_map(
-        partition_rows: Iterable[Row],
-        colname: str = 'PointSeq',
-        utc: str = 'UTC'
+    partition_rows: Iterable[Row], colname: str = "PointSeq", utc: str = "UTC"
 ) -> List[Tuple[Union[STBox, None]]]:
     """
     Function to aggregate rows containing a series of rows containing a
@@ -75,19 +73,17 @@ def bounds_calculate_map(
     aggregator = TemporalPointExtentAggregator.start_aggregation()
     for row in partition_rows:
         if type(row) == Row:
-            seq = row[colname] #TGeomPointSeq(row[colname].__str__())
+            seq = row[colname]  # TGeomPointSeq(row[colname].__str__())
             aggregator.add(seq)
     try:
         boundbox = STBoxWrap(aggregator.aggregation().__str__())
-        return [(boundbox)]#[(boundbox)]
+        return [(boundbox)]  # [(boundbox)]
     except:
         return [(None)]
 
 
 def bounds_calculate_reduce(
-        bounds1: Union[STBox, None],
-        bounds2: Union[STBox, None],
-        utc='utc'
+    bounds1: Union[STBox, None], bounds2: Union[STBox, None], utc="utc"
 ) -> Union[STBox, None]:
     """
     Reduces a series of STBoxes into the overall spatiotemporal space of all the
@@ -99,7 +95,7 @@ def bounds_calculate_reduce(
     """
     pymeos_initialize(utc)
     aggregation = None
-    
+
     if bounds1 and bounds2:
         aggregation = bounds1 + bounds2
     elif not bounds1 and bounds2:
@@ -126,65 +122,97 @@ def new_bounds_from_axis(bounds: STBox, axis: str, p: TPoint, to: str) -> STBox:
     """
     b = p.bounding_box()
     newbounds = None
-    if axis == 'x':
-        if to == 'left':
+    if axis == "x":
+        if to == "left":
             newbounds = STBox(
-                xmax=b.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
+                xmax=b.xmax(),
+                xmin=bounds.xmin(),
+                ymax=bounds.ymax(),
+                ymin=bounds.ymin(),
+                zmax=bounds.zmax(),
+                zmin=bounds.zmin(),
+                tmax=bounds.tmax(),
+                tmin=bounds.tmin(),
             )
         else:
             newbounds = STBox(
-                xmax=bounds.xmax(), xmin=b.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
+                xmax=bounds.xmax(),
+                xmin=b.xmin(),
+                ymax=bounds.ymax(),
+                ymin=bounds.ymin(),
+                zmax=bounds.zmax(),
+                zmin=bounds.zmin(),
+                tmax=bounds.tmax(),
+                tmin=bounds.tmin(),
             )
-    if axis == 'y':
-        if to == 'left':
+    if axis == "y":
+        if to == "left":
             newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=b.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
-            )
-        else:
-            newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=b.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
-            )
-    if axis == 'z':
-        if to == 'left':
-            newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=b.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
+                xmax=bounds.xmax(),
+                xmin=bounds.xmin(),
+                ymax=b.ymax(),
+                ymin=bounds.ymin(),
+                zmax=bounds.zmax(),
+                zmin=bounds.zmin(),
+                tmax=bounds.tmax(),
+                tmin=bounds.tmin(),
             )
         else:
             newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=b.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
+                xmax=bounds.xmax(),
+                xmin=bounds.xmin(),
+                ymax=bounds.ymax(),
+                ymin=b.ymin(),
+                zmax=bounds.zmax(),
+                zmin=bounds.zmin(),
+                tmax=bounds.tmax(),
+                tmin=bounds.tmin(),
             )
-    if axis == 't':
-        if to == 'left':
+    if axis == "z":
+        if to == "left":
             newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=b.tmax(), tmin=bounds.tmin()
+                xmax=bounds.xmax(),
+                xmin=bounds.xmin(),
+                ymax=bounds.ymax(),
+                ymin=bounds.ymin(),
+                zmax=b.zmax(),
+                zmin=bounds.zmin(),
+                tmax=bounds.tmax(),
+                tmin=bounds.tmin(),
             )
         else:
             newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=b.tmin()
+                xmax=bounds.xmax(),
+                xmin=bounds.xmin(),
+                ymax=bounds.ymax(),
+                ymin=bounds.ymin(),
+                zmax=bounds.zmax(),
+                zmin=b.zmin(),
+                tmax=bounds.tmax(),
+                tmin=bounds.tmin(),
+            )
+    if axis == "t":
+        if to == "left":
+            newbounds = STBox(
+                xmax=bounds.xmax(),
+                xmin=bounds.xmin(),
+                ymax=bounds.ymax(),
+                ymin=bounds.ymin(),
+                zmax=bounds.zmax(),
+                zmin=bounds.zmin(),
+                tmax=b.tmax(),
+                tmin=bounds.tmin(),
+            )
+        else:
+            newbounds = STBox(
+                xmax=bounds.xmax(),
+                xmin=bounds.xmin(),
+                ymax=bounds.ymax(),
+                ymin=bounds.ymin(),
+                zmax=bounds.zmax(),
+                zmin=bounds.zmin(),
+                tmax=bounds.tmax(),
+                tmin=b.tmin(),
             )
     return newbounds
 
@@ -209,32 +237,48 @@ def from_axis(p: TPoint, axis: str):
 
 def new_bounds(bounds: STBox, axis: str, val_min, val_max) -> STBox:
     newbounds = None
-    if axis == 'x':
+    if axis == "x":
         newbounds = STBox(
-                xmax=val_max, xmin=val_min,
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
+            xmax=val_max,
+            xmin=val_min,
+            ymax=bounds.ymax(),
+            ymin=bounds.ymin(),
+            zmax=bounds.zmax(),
+            zmin=bounds.zmin(),
+            tmax=bounds.tmax(),
+            tmin=bounds.tmin(),
         )
-    if axis == 'y':
+    if axis == "y":
         newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=val_max, ymin=val_min,
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=bounds.tmax(), tmin=bounds.tmin()
+            xmax=bounds.xmax(),
+            xmin=bounds.xmin(),
+            ymax=val_max,
+            ymin=val_min,
+            zmax=bounds.zmax(),
+            zmin=bounds.zmin(),
+            tmax=bounds.tmax(),
+            tmin=bounds.tmin(),
         )
-    if axis == 'z':
+    if axis == "z":
         newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=val_max, zmin=val_min,
-                tmax=bounds.tmax(), tmin=bounds.tmin()
+            xmax=bounds.xmax(),
+            xmin=bounds.xmin(),
+            ymax=bounds.ymax(),
+            ymin=bounds.ymin(),
+            zmax=val_max,
+            zmin=val_min,
+            tmax=bounds.tmax(),
+            tmin=bounds.tmin(),
         )
-    if axis == 't':
+    if axis == "t":
         newbounds = STBox(
-                xmax=bounds.xmax(), xmin=bounds.xmin(),
-                ymax=bounds.ymax(), ymin=bounds.ymin(),
-                zmax=bounds.zmax(), zmin=bounds.zmin(),
-                tmax=val_max, tmin=val_min
+            xmax=bounds.xmax(),
+            xmin=bounds.xmin(),
+            ymax=bounds.ymax(),
+            ymin=bounds.ymin(),
+            zmax=bounds.zmax(),
+            zmin=bounds.zmin(),
+            tmax=val_max,
+            tmin=val_min,
         )
     return newbounds

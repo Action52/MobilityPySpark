@@ -1,13 +1,14 @@
 # MobilitySpark
 ***
 Repository to extend support of MEOS and MobilityDB data types into Pyspark, and experimentation on different partition techniques for trajectory data.
+This repository was used as codebase for the thesis "MobilitySpark: Big Mobility Data Management with PySpark and PyMEOS".
 
 ## Install
 
 ### Through Docker
 
 The project can be run locally using Docker. This is method is preferred if you have a
-Mac with M+ Chip.
+Mac with M-Series Chip.
 
 1. Download this repository.
 2. <code>cd</code> into the *container* folder.
@@ -69,3 +70,21 @@ jupyter notebook
 ```
 
 5. Now you can run the notebooks of the project by going to /notebooks inside your local Jupyter server.
+
+## Examples
+
+There are three example notebooks located at the <code>/notebooks/</code> folder:
+1. *UDTDemo.ipynb* - Provides an introduction to MobilitySpark, partitioning mobility data, and reading/writing these files using PySpark.
+2. *PartitioningSchemesWithPyMEOS.ipynb* - Recreates the OpenSky experiments performed in the thesis.
+3. *BerlinMODQueries.ipynb* - Recreates the BerlinMOD experiments performed in the thesis.
+
+## Sample plots
+
+![](sample_charts/jette_exp2.png)
+![](sample_charts/jette_auderguem_exp2.png)
+![](sample_charts/dots_subplot_4_large.svg)
+
+## License
+
+MIT License
+Copyright (c) 2024 Luis Alfredo León Villapún, see LICENSE

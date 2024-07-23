@@ -28,11 +28,7 @@ class GridPartition(MobilityPartitioner):
         """
         self.grid = [
             tile.set_srid(0)
-            for tile in self._generate_grid(
-                bounds,
-                cells_per_side,
-                geodetic=geodetic
-            )
+            for tile in self._generate_grid(bounds, cells_per_side, geodetic=geodetic)
         ]
         self.tilesstr = [str(tile) for tile in self.grid]
         self.total_partitions = len(self.grid)

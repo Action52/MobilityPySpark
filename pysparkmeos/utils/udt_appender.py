@@ -14,10 +14,10 @@ def udt_append():
     TGeogPointInst.__UDT__ = TGeogPointInstUDT()
     TGeogPointSeq.__UDT__ = TGeogPointSeqUDT()
     TGeogPointSeqSet.__UDT__ = TGeogPointSeqSetUDT()
-    
+
     TFloatInst.__UDT__ = TFloatInstUDT()
     TFloat.__UDT__ = TFloatInstUDT()
-    
+
     STBox.__UDT__ = STBoxUDT()
     TsTzSpan.__UDT__ = TsTzSpanUDT()
 
@@ -26,10 +26,7 @@ def udt_append():
     TGeomPointSeqSet.__UDT__ = TGeomPointSeqSetUDT()
 
     TBoolInst.__UDT__ = TBoolInstUDT()
-    
+
     Point.__UDT__ = GeometryUDT()
     Polygon.__UDT__ = GeometryUDT()
     MultiPolygon.__UDT__ = GeometryUDT()
-
-
-    

@@ -11,11 +11,11 @@ class KDTreePartition(MobilityPartitioner):
     """
 
     def __init__(
-            self,
-            moving_objects: List[TPoint],
-            bounds: STBox,
-            dimensions: tuple,
-            max_depth=12
+        self,
+        moving_objects: List[TPoint],
+        bounds: STBox,
+        dimensions: tuple,
+        max_depth=12,
     ):
         """
         :param moving_objects: A list containing the moving objects (or a sample)
@@ -28,7 +28,9 @@ class KDTreePartition(MobilityPartitioner):
         """
         self.max_depth = max_depth
         self.bounds = bounds
-        self.grid = self._generate_grid(bounds, moving_objects, 0, dimensions, max_depth)
+        self.grid = self._generate_grid(
+            bounds, moving_objects, 0, dimensions, max_depth
+        )
         self.numPartitions = len(self.grid)
         self.tilesstr = [tile.__str__() for tile in self.grid]
         super().__init__(self.numPartitions, self.get_partition)
@@ -59,9 +61,7 @@ class KDTreePartition(MobilityPartitioner):
         pointsat = [point.at(bounds) for point in movingobjects]
 
         if type(pointsat[0]) == TGeomPointSeq:
-            convert = [
-                instant for point in pointsat for instant in point.instants()
-            ]
+            convert = [instant for point in pointsat for instant in point.instants()]
             movingobjects = convert
         if type(pointsat[0]) == TGeomPointSeqSet:
             convert = [
@@ -109,43 +109,39 @@ class KDTreePartition(MobilityPartitioner):
         return self.numPartitions
 
 
-def gentestdata(read_as='TInst'):
+def gentestdata(read_as="TInst"):
     import pandas as pd
 
     testtrips = pd.read_csv(
-        "../mobilitydb-berlinmod-sf0.1/trips_sample_pymeos.csv",
-        index_col=0
+        "../mobilitydb-berlinmod-sf0.1/trips_sample_pymeos.csv", index_col=0
     )
-    testtrips['trip'] = testtrips['trip'].apply(lambda x: TGeomPointSeqSet(x))
-    bounds = TemporalPointExtentAggregator().aggregate(testtrips['trip'])
+    testtrips["trip"] = testtrips["trip"].apply(lambda x: TGeomPointSeqSet(x))
+    bounds = TemporalPointExtentAggregator().aggregate(testtrips["trip"])
     seqs1 = []
     seqs = []
-    if read_as == 'TInst':
-        seqs1 = [trip.instants() for trip in testtrips['trip']]
+    if read_as == "TInst":
+        seqs1 = [trip.instants() for trip in testtrips["trip"]]
         for seq in seqs1:
             seqs.extend(seq)
         return seqs, bounds
-    if read_as == 'TSeq':
-        seqs1 = [trip.sequences() for trip in testtrips['trip']]
+    if read_as == "TSeq":
+        seqs1 = [trip.sequences() for trip in testtrips["trip"]]
         for seq in seqs1:
             seqs.extend(seq)
         return seqs, bounds
-    if read_as == 'TSeqSet':
-        return list(testtrips['trip']), bounds
+    if read_as == "TSeqSet":
+        return list(testtrips["trip"]), bounds
 
 
 def main():
     pymeos_initialize()
-    testtrips, bounds = gentestdata(read_as='TSeq')
+    testtrips, bounds = gentestdata(read_as="TSeq")
     print(bounds)
     kdpart = KDTreePartition(
-        moving_objects=testtrips,
-        dimensions=('x', 'y'),
-        bounds=bounds,
-        max_depth=3
+        moving_objects=testtrips, dimensions=("x", "y"), bounds=bounds, max_depth=3
     )
     print(kdpart.tilesstr)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -7,17 +7,18 @@ import itertools
 
 class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
     def __init__(
-            self,
-            spark,
-            bounds,
-            dfname,
-            colname,
-            num_tiles,
-            dimensions=["x", "y", "t"],
-            utc="UTC"
+        self,
+        spark,
+        bounds,
+        dfname,
+        colname,
+        num_tiles,
+        dimensions=["x", "y", "t"],
+        utc="UTC",
     ):
         self.grid = [
-            tile for tile in self._generate_grid(
+            tile
+            for tile in self._generate_grid(
                 spark, bounds, dfname, colname, num_tiles, dimensions, utc
             )
         ]
@@ -27,23 +28,23 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
 
     @staticmethod
     def _generate_grid(
-            spark,
-            bounds: STBox,
-            dfname,
-            colname,
-            num_tiles: int,
-            dimensions=["x", "y", "t"],
-            utc: str = "UTC"
+        spark,
+        bounds: STBox,
+        dfname,
+        colname,
+        num_tiles: int,
+        dimensions=["x", "y", "t"],
+        utc: str = "UTC",
     ):
         pymeos_initialize(utc)
 
         unchecked_dims = dimensions
         new_tiles = {}
-        while (unchecked_dims):
+        while unchecked_dims:
             cur_dim = unchecked_dims.pop()
-            new_tiles[
-                cur_dim] = AdaptiveBinsPartitionerSpark._generate_grid_dim(
-                spark, bounds, dfname, colname, cur_dim, num_tiles, utc)
+            new_tiles[cur_dim] = AdaptiveBinsPartitionerSpark._generate_grid_dim(
+                spark, bounds, dfname, colname, cur_dim, num_tiles, utc
+            )
 
         tiles = []
         for combination in itertools.product(*new_tiles.values()):
@@ -60,13 +61,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
 
     @staticmethod
     def _generate_grid_dim(
-            spark,
-            bounds: STBox,
-            dfname,
-            colname,
-            dim: str,
-            num_tiles: int,
-            utc: str
+        spark, bounds: STBox, dfname, colname, dim: str, num_tiles: int, utc: str
     ):
         pymeos_initialize(utc)
 
@@ -97,7 +92,7 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
         FROM Bins2, MaxDimVals
         WHERE RowNo = 1;
         """
-        if dim == 't':
+        if dim == "t":
             dims_query = f"""
                 WITH 
                 Times(T) AS (
@@ -130,26 +125,27 @@ class AdaptiveBinsPartitionerSpark(MobilityPartitioner):
             minbound = row.minbound
             maxbound = row.maxbound
             if i == 0:
-                if dim == 'x':
+                if dim == "x":
                     minbound = min(bounds.xmin(), row.minbound)
-                if dim == 'y':
+                if dim == "y":
                     minbound = min(bounds.ymin(), row.minbound)
-                if dim == 'z':
+                if dim == "z":
                     minbound = min(bounds.zmin(), row.minbound)
-                if dim == 't':
+                if dim == "t":
                     minbound = row.minbound.replace(tzinfo=bounds.tmin().tzinfo)
                     minbound = min(bounds.tmin(), minbound)
             if i == len(binrows) - 1:
-                if dim == 'x':
+                if dim == "x":
                     maxbound = bounds.xmax()
-                if dim == 'y':
+                if dim == "y":
                     maxbound = bounds.ymax()
-                if dim == 'z':
+                if dim == "z":
                     maxbound = bounds.zmax()
-                if dim == 't':
+                if dim == "t":
                     maxbound = bounds.tmax()
-            tiles.append(STBoxWrap(
-                new_bounds(bounds, dim, minbound, maxbound).__str__()))
+            tiles.append(
+                STBoxWrap(new_bounds(bounds, dim, minbound, maxbound).__str__())
+            )
         return tiles
 
     def num_partitions(self) -> int:

@@ -9,19 +9,21 @@ from pyspark.ml.feature import VectorAssembler
 
 import pyspark.sql.functions as F
 
+
 class BisectingKMeansPartitioner(MobilityPartitioner):
     def __init__(
-            self,
-            bounds,
-            instants,
-            traj_colname,
-            num_tiles,
-            dimensions=['x', 'y', 't'],
-            utc="UTC",
-            seed=3
+        self,
+        bounds,
+        instants,
+        traj_colname,
+        num_tiles,
+        dimensions=["x", "y", "t"],
+        utc="UTC",
+        seed=3,
     ):
         self.grid = [
-            tile for tile in self._generate_grid(
+            tile
+            for tile in self._generate_grid(
                 bounds, instants, traj_colname, num_tiles, dimensions, utc, seed
             )
         ]
@@ -31,22 +33,22 @@ class BisectingKMeansPartitioner(MobilityPartitioner):
 
     @staticmethod
     def _generate_grid(
-            bounds: STBox,
-            instants,
-            traj_colname,
-            num_tiles: int,
-            dimensions=["x", "y", "t"],
-            utc: str = "UTC",
-            seed=None
+        bounds: STBox,
+        instants,
+        traj_colname,
+        num_tiles: int,
+        dimensions=["x", "y", "t"],
+        utc: str = "UTC",
+        seed=None,
     ):
         pymeos_initialize(utc)
-        if 't' in dimensions:
-            instants = instants.withColumn("ts", F.unix_timestamp('t'))
+        if "t" in dimensions:
+            instants = instants.withColumn("ts", F.unix_timestamp("t"))
 
-        dims = [dim for dim in dimensions if dim != 't']
-        dims.append('ts')
+        dims = [dim for dim in dimensions if dim != "t"]
+        dims.append("ts")
 
-        vt = VectorAssembler(inputCols=dims, outputCol='vecfeatures')
+        vt = VectorAssembler(inputCols=dims, outputCol="vecfeatures")
         scaler = StandardScaler(withStd=True, withMean=True)
         scaler.setInputCol("vecfeatures")
         scaler.setOutputCol("features")
@@ -57,15 +59,12 @@ class BisectingKMeansPartitioner(MobilityPartitioner):
 
         pipeline = Pipeline(stages=[vt, scaler, bkm])
         model = pipeline.fit(instants)
-        prediction = model.transform(instants).select(traj_colname,
-                                                      'prediction')
+        prediction = model.transform(instants).select(traj_colname, "prediction")
 
         tiles = [
-            prediction.where(f'prediction = {cluster_idx}').rdd.mapPartitions(
-                lambda x: bounds_calculate_map(x, traj_colname, utc)
-            ).reduce(
-                lambda x, y: bounds_calculate_reduce(x, y, utc)
-            )
+            prediction.where(f"prediction = {cluster_idx}")
+            .rdd.mapPartitions(lambda x: bounds_calculate_map(x, traj_colname, utc))
+            .reduce(lambda x, y: bounds_calculate_reduce(x, y, utc))
             for cluster_idx in range(num_tiles)
         ]
         return tiles

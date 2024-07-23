@@ -252,4 +252,4 @@ querytext20 = """
 """
 
 
-#q13, q13stats, plan13 = query_exec(querytext13, spark, explain=True)
+# q13, q13stats, plan13 = query_exec(querytext13, spark, explain=True)

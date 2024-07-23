@@ -10,7 +10,7 @@ from shapely import from_wkt, to_wkt, Geometry
 
 from pysparkmeos.UDT.wrappers import *
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class MeosDatatypeUDT(Generic[T], UserDefinedType):
@@ -50,9 +50,7 @@ class MeosDatatypeUDT(Generic[T], UserDefinedType):
         Factory method to create an instance of T from a string.
         This method should be overridden by all subclasses.
         """
-        raise NotImplementedError(
-            "Subclasses must implement from_string method."
-        )
+        raise NotImplementedError("Subclasses must implement from_string method.")
 
     def simpleString(self) -> str:
         return "meosdatatype"
@@ -68,7 +66,7 @@ UDTs
 class TGeogPointInstUDT(MeosDatatypeUDT[TGeogPointInstWrap]):
     def simpleString(self) -> str:
         return "tgeogpointinst"
-        
+
     def from_string(self, datum: str) -> TGeogPointInstWrap:
         return TGeogPointInstWrap(datum)
 
@@ -95,11 +93,11 @@ class TGeomPointSeqSetUDT(MeosDatatypeUDT[TGeomPointSeqSetWrap]):
 
     def from_string(self, datum: str) -> TGeomPointSeqSetWrap:
         return TGeomPointSeqSetWrap(datum)
-        
+
 
 class TFloatInstUDT(MeosDatatypeUDT[TFloatInst]):
     def simpleString(self) -> str:
-        return "tfloatinst"    
+        return "tfloatinst"
 
     def from_string(self, datum: str) -> TFloatInst:
         return TFloatInst(datum)
@@ -108,7 +106,7 @@ class TFloatInstUDT(MeosDatatypeUDT[TFloatInst]):
 class STBoxUDT(MeosDatatypeUDT[STBoxWrap]):
     def simpleString(self) -> str:
         return "stbox"
-        
+
     def from_string(self, datum: str) -> STBoxWrap:
         return STBoxWrap(datum)
 

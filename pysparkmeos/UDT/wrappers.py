@@ -35,7 +35,6 @@ class TGeogPointSeqSetWrap(TGeogPointSeqSet):
         return self.__str__()
 
 
-
 class TGeogPointSeqWrap(TGeogPointSeq):
     def __setstate__(self, state):
         pymeos_initialize()

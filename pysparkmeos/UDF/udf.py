@@ -16,10 +16,7 @@ from shapely import from_wkt
 
 @F.udf(returnType=TGeomPointInstUDT())
 def create_point_udf(
-        lat: float,
-        lon: float,
-        time: datetime,
-        utc="UTC"
+    lat: float, lon: float, time: datetime, utc="UTC"
 ) -> TGeomPointInst:
     """
     Creates a TGeomPointInst based lat, lon and timestamp.
@@ -38,10 +35,7 @@ def create_point_udf(
 
 @F.udf(returnType=IntegerType())
 def create_pointseq_instants_udf(
-        lats: List[float],
-        lons: List[float],
-        times: List[datetime],
-        utc: str = "UTC"
+    lats: List[float], lons: List[float], times: List[datetime], utc: str = "UTC"
 ) -> int:
     """
     Returns the number of instants from a point sequence.
@@ -53,12 +47,16 @@ def create_pointseq_instants_udf(
     :return:
     """
     pymeos_initialize(utc)
-    
+
     # Combine lat, lon, and time into a list of tuples and sort them by time
     combined = sorted(zip(lats, lons, times), key=lambda x: x[2])
-        
-    points_inst_list = [TGeogPointInst(f"Point({lon} {lat})@{time}") for lat, lon, time in combined]
-    point_seq = TGeogPointSeq(instant_list=points_inst_list, lower_inc=True, upper_inc=True)
+
+    points_inst_list = [
+        TGeogPointInst(f"Point({lon} {lat})@{time}") for lat, lon, time in combined
+    ]
+    point_seq = TGeogPointSeq(
+        instant_list=points_inst_list, lower_inc=True, upper_inc=True
+    )
     instants = point_seq.num_instants()
     return instants
 
@@ -114,11 +112,15 @@ def get_point_timestamp(point: TPoint, utc: str = "UTC") -> datetime:
 
 @F.udf(returnType=STBoxUDT())
 def bounds_as_box(
-    xmin: TFloat, xmax: TFloat,
-    ymin: TFloat, ymax: TFloat,
-    tmin: datetime = None, tmax: datetime = None,
-    zmin: TFloat = None, zmax: TFloat = None,
-    utc: str = "UTC"
+    xmin: TFloat,
+    xmax: TFloat,
+    ymin: TFloat,
+    ymax: TFloat,
+    tmin: datetime = None,
+    tmax: datetime = None,
+    zmin: TFloat = None,
+    zmax: TFloat = None,
+    utc: str = "UTC",
 ) -> STBox:
     """
     Gets the bounds of a space given the x,y, and/or z/t values.
@@ -126,23 +128,19 @@ def bounds_as_box(
     pymeos_initialize(utc)
     if tmin and zmin:
         return STBox(
-            xmax=xmax, xmin=xmin,
-            ymax=ymax, ymin=ymin,
-            tmin=tmin, tmax=tmax,
-            zmin=zmin, zmax=zmax
+            xmax=xmax,
+            xmin=xmin,
+            ymax=ymax,
+            ymin=ymin,
+            tmin=tmin,
+            tmax=tmax,
+            zmin=zmin,
+            zmax=zmax,
         )
     elif tmin and not zmin:
-        return STBox(
-            xmax=xmax, xmin=xmin,
-            ymax=ymax, ymin=ymin,
-            tmin=tmin, tmax=tmax
-        )
+        return STBox(xmax=xmax, xmin=xmin, ymax=ymax, ymin=ymin, tmin=tmin, tmax=tmax)
     elif zmin and not tmin:
-        return STBox(
-            xmax=xmax, xmin=xmin,
-            ymax=ymax, ymin=ymin,
-            zmin=zmin, zmax=zmax
-        )
+        return STBox(xmax=xmax, xmin=xmin, ymax=ymax, ymin=ymin, zmin=zmin, zmax=zmax)
 
 
 @F.udf(returnType=BooleanType())
@@ -195,10 +193,7 @@ def trip_from_hexwkb(trip: str, utc: str = "UTC") -> TGeomPointSeq:
 
 @F.udf(returnType=GeometryUDT())
 def tpoint_at(
-        trip: TPoint,
-        instant: TInstant,
-        return_start_value: bool = True,
-        utc: str = "UTC"
+    trip: TPoint, instant: TInstant, return_start_value: bool = True, utc: str = "UTC"
 ) -> Geometry:
     """
     Returns the geometry of a tpoint a particular timestamp.
@@ -220,9 +215,7 @@ def tpoint_at(
 
 @F.udf(returnType=BooleanType())
 def temporally_contains(
-        trip: TPoint,
-        other: Union[Time, Temporal, Box],
-        utc: str = "UTC"
+    trip: TPoint, other: Union[Time, Temporal, Box], utc: str = "UTC"
 ) -> bool:
     """
     Returns true if the tpoint temporally contains other.
@@ -237,8 +230,7 @@ def temporally_contains(
 
 @F.udf(returnType=TGeomPointSeqUDT())
 def tgeompointseq_from_instant_list(
-        pointgroup: List[Union[str, TGeomPointInst]],
-        utc: str = "UTC"
+    pointgroup: List[Union[str, TGeomPointInst]], utc: str = "UTC"
 ) -> TGeomPointSeq:
     """
     Creates a TGeomPointSeq based on a list of TGeomPointInst.
@@ -250,7 +242,7 @@ def tgeompointseq_from_instant_list(
         return None
     pymeos_initialize(utc)
     if len(pointgroup) == 1:
-        pointgroup = f'[{pointgroup[0].__str__()}]'
+        pointgroup = f"[{pointgroup[0].__str__()}]"
         return TGeomPointSeq(pointgroup)
     pointgroup = sorted(pointgroup, key=lambda x: x.timestamps()[0])
     pointseq = TGeomPointSeq(instant_list=pointgroup)
@@ -271,9 +263,7 @@ def point_to_stbox(tpoint: TPoint, utc: str = "UTC") -> STBox:
 
 @F.udf(returnType=TBoolInstUDT())
 def tboolinst_from_base_time(
-        base: datetime,
-        value: bool = True,
-        utc: str = "UTC"
+    base: datetime, value: bool = True, utc: str = "UTC"
 ) -> TBoolInst:
     """
     Creates a TBoolInst object from a base datetime.
@@ -288,9 +278,7 @@ def tboolinst_from_base_time(
 
 @F.udf(returnType=BooleanType())
 def ever_intersects(
-        trip: TPoint,
-        other: Union[Geometry, TPoint, STBox],
-        utc: str = "UTC"
+    trip: TPoint, other: Union[Geometry, TPoint, STBox], utc: str = "UTC"
 ) -> bool:
     """
     Returns if a TPoint ever intersects other (Geometry, TPoint or STBox).
@@ -305,33 +293,33 @@ def ever_intersects(
     return trip.ever_intersects(other)
 
 
-@F.udf(returnType = ArrayType(TGeomPointInstUDT()))
-def instants(tpoint, utc = "UTC"):
+@F.udf(returnType=ArrayType(TGeomPointInstUDT()))
+def instants(tpoint, utc="UTC"):
     pymeos_initialize(utc)
     return tpoint.instants()
 
-@F.udf(returnType = ArrayType(TGeomPointSeqUDT()))
-def sequences(tpoint, utc = "UTC"):
+
+@F.udf(returnType=ArrayType(TGeomPointSeqUDT()))
+def sequences(tpoint, utc="UTC"):
     pymeos_initialize(utc)
     return tpoint.sequences()
 
-@F.udf(returnType = TGeomPointInstUDT())
-def nearest_approach_instant(tpoint, other, utc = "UTC"):
+
+@F.udf(returnType=TGeomPointInstUDT())
+def nearest_approach_instant(tpoint, other, utc="UTC"):
     pymeos_initialize(utc)
     return tpoint.nearest_approach_instant(other)
 
 
-@F.udf(returnType = TFloatInstUDT())
-def distance(tpoint, other, utc = "UTC"):
+@F.udf(returnType=TFloatInstUDT())
+def distance(tpoint, other, utc="UTC"):
     pymeos_initialize(utc)
     return tpoint.distance(other)
 
 
 @F.udf(returnType=FloatType())
 def min_distance(
-        trip: TPoint,
-        other: Union[Geometry, TPoint, STBox],
-        utc: str = "UTC"
+    trip: TPoint, other: Union[Geometry, TPoint, STBox], utc: str = "UTC"
 ) -> Union[float, None]:
     """
     Returns the minimum distance between a TPoint, and other.
@@ -344,16 +332,14 @@ def min_distance(
     dist = trip.distance(other)
     if dist:
         min_dist = dist.min_value()
-        return min_dist 
+        return min_dist
     else:
         return None
 
 
 @F.udf(returnType=FloatType())
 def nearest_approach_distance(
-        trip: TPoint,
-        other: Union[Geometry, STBox, TPoint],
-        utc: str = "UTC"
+    trip: TPoint, other: Union[Geometry, STBox, TPoint], utc: str = "UTC"
 ) -> Union[float, None]:
     """
     Calculates the nearest approach distance between a TPoint and other.
@@ -369,11 +355,7 @@ def nearest_approach_distance(
 
 
 @F.udf(returnType=TGeomPointInstUDT())
-def tgeompointinst(
-        point: Point,
-        instant: TInstant,
-        utc: str = "UTC"
-) -> TGeomPointInst:
+def tgeompointinst(point: Point, instant: TInstant, utc: str = "UTC") -> TGeomPointInst:
     """
     Returns a TGeomPointInst from a Point and a TInst.
     :param point:
@@ -386,11 +368,7 @@ def tgeompointinst(
 
 
 @F.udf(returnType=TGeomPointSeqUDT())
-def tgeompointseq(
-        geom,
-        period: TsTzSpan,
-        utc: str = "UTC"
-) -> TGeomPointSeq:
+def tgeompointseq(geom, period: TsTzSpan, utc: str = "UTC") -> TGeomPointSeq:
     """
     Creates a TGeomPointSeq based on a Geometry and a TsTzSpan.
     :param geom:
@@ -400,9 +378,7 @@ def tgeompointseq(
     """
     pymeos_initialize(utc)
     return TGeomPointSeq.from_base_time(
-        value=geom,
-        base=period,
-        interpolation=TInterpolation.DISCRETE
+        value=geom, base=period, interpolation=TInterpolation.DISCRETE
     )
 
 
@@ -428,9 +404,7 @@ def at_period(trip: TPoint, period: TsTzSpan, utc: str = "UTC") -> TGeomPointSeq
 
 @F.udf(returnType=BooleanType())
 def contains_stbox_stbox(
-        stbox: STBox,
-        other: Union[Geometry, STBox, Temporal, Time],
-        utc: str = "UTC"
+    stbox: STBox, other: Union[Geometry, STBox, Temporal, Time], utc: str = "UTC"
 ) -> bool:
     """
     Returns True if the stbox contains other.
@@ -445,9 +419,7 @@ def contains_stbox_stbox(
 
 @F.udf(returnType=BooleanType())
 def temporally_overlaps(
-        temporal: Temporal,
-        other: Union[Time, Temporal, Box],
-        utc: str = "UTC"
+    temporal: Temporal, other: Union[Time, Temporal, Box], utc: str = "UTC"
 ) -> bool:
     """
     Returns if a temporal temporally overlaps other.
@@ -462,9 +434,7 @@ def temporally_overlaps(
 
 @F.udf(returnType=TBoolInstUDT())
 def datetime_to_tinstant(
-        instant: datetime,
-        value: bool = True,
-        utc: str = "UTC"
+    instant: datetime, value: bool = True, utc: str = "UTC"
 ) -> TBoolInst:
     """
     Converts a datetime to a TBool.
@@ -527,23 +497,32 @@ def tstzspan_from_values(lower, upper, utc="UTC"):
 
 
 @F.udf(returnType=ArrayType(FloatType()))
-def spatial_values(traj, dim, utc='UTC'):
+def spatial_values(traj, dim, utc="UTC"):
     pymeos_initialize(utc)
-    if dim == 'x':
+    if dim == "x":
         return traj.x().values()
-    if dim == 'y':
+    if dim == "y":
         return traj.y().values()
-    if dim == 'z':
+    if dim == "z":
         return traj.z().values()
 
+
 import pandas as pd
+
+
 @F.udf(returnType=TGeomPointSeqUDT())
 def tgeompointseq_from_tpoint_list(tpoints, utc="UTC"):
     pymeos_initialize(utc)
-    tpoints = pd.DataFrame(tpoints, columns=['point', 'ts']).drop_duplicates(subset=['ts']).sort_values(by="ts")
-    tpoints['tpoint'] = tpoints.apply(lambda x: TGeomPointInst(point=x['point'], timestamp=x['ts']), axis=1)
+    tpoints = (
+        pd.DataFrame(tpoints, columns=["point", "ts"])
+        .drop_duplicates(subset=["ts"])
+        .sort_values(by="ts")
+    )
+    tpoints["tpoint"] = tpoints.apply(
+        lambda x: TGeomPointInst(point=x["point"], timestamp=x["ts"]), axis=1
+    )
     try:
-        tgeompointseq = TGeomPointSeq(instant_list=tpoints['tpoint'])
+        tgeompointseq = TGeomPointSeq(instant_list=tpoints["tpoint"])
         return tgeompointseq
     except:
         return None
@@ -560,16 +539,18 @@ def main():
     pymeos_initialize("UTC")
 
     # Initialize a Spark session
-    spark = SparkSession.builder \
-        .appName("UDF Test Environment") \
-        .master("local[1]") \
-        .config("spark.sql.execution.arrow.maxRecordsPerBatch", "100") \
+    spark = (
+        SparkSession.builder.appName("UDF Test Environment")
+        .master("local[1]")
+        .config("spark.sql.execution.arrow.maxRecordsPerBatch", "100")
         .getOrCreate()
+    )
 
     spark.udf.register("tgeompointseqset", tgeompointseqset)
 
-    trips = spark.read.csv("../mobilitydb-berlinmod-sf0.1/trips_sample_pymeos.csv", header=True) \
-        .withColumn("trip", tgeompointseqset("trip"))
+    trips = spark.read.csv(
+        "../mobilitydb-berlinmod-sf0.1/trips_sample_pymeos.csv", header=True
+    ).withColumn("trip", tgeompointseqset("trip"))
 
     trips.printSchema()
 

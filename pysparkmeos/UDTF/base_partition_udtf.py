@@ -16,10 +16,10 @@ partition_schema = StructType(
 
 class BasePartitionUDTF:
     def __init__(
-            self,
-            response_extra_cols: Iterable = None,
-            check_function: Callable = None,
-            return_full_traj: bool = False
+        self,
+        response_extra_cols: Iterable = None,
+        check_function: Callable = None,
+        return_full_traj: bool = False,
     ):
         """
         Useful to inherit this class to other UDTFs that have the same behavior
@@ -85,8 +85,7 @@ class BasePartitionUDTF:
 
         if not self.check_function:
             partitioned = [
-                (key, trajectory.at(tile))
-                for key, tile in zip(tileids, tiles)
+                (key, trajectory.at(tile)) for key, tile in zip(tileids, tiles)
             ]
         else:
             partitioned = [
@@ -102,15 +101,11 @@ class BasePartitionUDTF:
             else:
                 response = [
                     row[col]
-                    for col in self.response_extra_cols if
-                    self.response_extra_cols
+                    for col in self.response_extra_cols
+                    if self.response_extra_cols
                 ]
                 if self.return_full_traj:
-                    response.extend(
-                        [trajectory_id, partition_key, trajectory]
-                    )
+                    response.extend([trajectory_id, partition_key, trajectory])
                 else:
-                    response.extend(
-                        [trajectory_id, partition_key, partition_traj]
-                    )
+                    response.extend([trajectory_id, partition_key, partition_traj])
                 yield response

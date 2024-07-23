@@ -41,7 +41,7 @@ class MobilityPartitioner(Partitioner):
     def get_partition(
         movingobject: Union[TGeomPoint, TGeogPoint, STBox, Geometry],
         tiles: List[STBox],
-        utc_time: str = "UTC"
+        utc_time: str = "UTC",
     ) -> int:
         """
         Function to partition a moving object and return the partition index(es)
@@ -70,7 +70,7 @@ class MobilityPartitioner(Partitioner):
 
         yield -1
 
-    def plot(self, how: str = 'xy', **kwargs):
+    def plot(self, how: str = "xy", **kwargs):
         """
         Plots the tiles.
 
@@ -80,9 +80,9 @@ class MobilityPartitioner(Partitioner):
         """
         for tile in self.tilesstr:
             stbox = STBox(tile)
-            if how == 'xy':
+            if how == "xy":
                 stbox.plot_xy(**kwargs)
-            elif how == 'xt':
+            elif how == "xt":
                 stbox.plot_xt(**kwargs)
-            elif how == 'yt':
+            elif how == "yt":
                 stbox.plot_yt(**kwargs)
