@@ -1,0 +1,15 @@
+Experiment,Data Size,Entropy
+Adaptive Bins Spark,15 min,4.055482699520757
+Adaptive Bins Spark,6 hrs,3.9240446355178524
+Approximate Adaptive Bins,15 min,3.913422214541335
+Approximate Adaptive Bins,6 hrs,3.9486533890421573
+Bisective K-Means,15 min,2.2075893984712387
+Bisective K-Means,6 hrs,2.511231208530875
+In-Memory KDTree,15 min,4.154128871667796
+In-Memory KDTree,6 hrs,4.144415383942462
+In-memory AdaptiveBins,15 min,4.059429594769076
+In-memory AdaptiveBins,6 hrs,3.92117721646658
+KDTree Spark,15 min,4.150371097566804
+KDTree Spark,6 hrs,4.146059893154939
+RegularGrid,15 min,3.412888509728981
+RegularGrid,6 hrs,3.5658266221747157

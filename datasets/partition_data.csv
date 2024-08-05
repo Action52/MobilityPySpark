@@ -1,0 +1,797 @@
+partitionKey,count,experiment,size
+0,3,RegularGrid,15 min
+1,3,RegularGrid,15 min
+2,5,RegularGrid,15 min
+3,4,RegularGrid,15 min
+4,2,RegularGrid,15 min
+5,2,RegularGrid,15 min
+6,2,RegularGrid,15 min
+7,2,RegularGrid,15 min
+8,1530,RegularGrid,15 min
+9,1658,RegularGrid,15 min
+10,1699,RegularGrid,15 min
+11,1698,RegularGrid,15 min
+12,650,RegularGrid,15 min
+13,706,RegularGrid,15 min
+14,717,RegularGrid,15 min
+15,733,RegularGrid,15 min
+16,52,RegularGrid,15 min
+17,57,RegularGrid,15 min
+18,64,RegularGrid,15 min
+19,63,RegularGrid,15 min
+20,46,RegularGrid,15 min
+21,57,RegularGrid,15 min
+22,63,RegularGrid,15 min
+23,58,RegularGrid,15 min
+24,1300,RegularGrid,15 min
+25,1414,RegularGrid,15 min
+26,1462,RegularGrid,15 min
+27,1468,RegularGrid,15 min
+28,737,RegularGrid,15 min
+29,800,RegularGrid,15 min
+30,816,RegularGrid,15 min
+31,818,RegularGrid,15 min
+36,8,RegularGrid,15 min
+37,8,RegularGrid,15 min
+38,7,RegularGrid,15 min
+39,7,RegularGrid,15 min
+40,376,RegularGrid,15 min
+41,410,RegularGrid,15 min
+42,433,RegularGrid,15 min
+43,427,RegularGrid,15 min
+44,559,RegularGrid,15 min
+45,578,RegularGrid,15 min
+46,584,RegularGrid,15 min
+47,583,RegularGrid,15 min
+48,292,RegularGrid,15 min
+49,328,RegularGrid,15 min
+50,347,RegularGrid,15 min
+51,350,RegularGrid,15 min
+52,35,RegularGrid,15 min
+53,42,RegularGrid,15 min
+54,45,RegularGrid,15 min
+55,50,RegularGrid,15 min
+56,260,RegularGrid,15 min
+57,301,RegularGrid,15 min
+58,317,RegularGrid,15 min
+59,337,RegularGrid,15 min
+60,12,RegularGrid,15 min
+61,13,RegularGrid,15 min
+62,16,RegularGrid,15 min
+63,18,RegularGrid,15 min
+0,353,In-Memory KDTree,15 min
+1,375,In-Memory KDTree,15 min
+2,329,In-Memory KDTree,15 min
+3,336,In-Memory KDTree,15 min
+4,365,In-Memory KDTree,15 min
+5,407,In-Memory KDTree,15 min
+6,375,In-Memory KDTree,15 min
+7,419,In-Memory KDTree,15 min
+8,415,In-Memory KDTree,15 min
+9,409,In-Memory KDTree,15 min
+10,377,In-Memory KDTree,15 min
+11,391,In-Memory KDTree,15 min
+12,414,In-Memory KDTree,15 min
+13,406,In-Memory KDTree,15 min
+14,390,In-Memory KDTree,15 min
+15,386,In-Memory KDTree,15 min
+16,386,In-Memory KDTree,15 min
+17,413,In-Memory KDTree,15 min
+18,364,In-Memory KDTree,15 min
+19,406,In-Memory KDTree,15 min
+20,362,In-Memory KDTree,15 min
+21,369,In-Memory KDTree,15 min
+22,370,In-Memory KDTree,15 min
+23,400,In-Memory KDTree,15 min
+24,441,In-Memory KDTree,15 min
+25,437,In-Memory KDTree,15 min
+26,431,In-Memory KDTree,15 min
+27,437,In-Memory KDTree,15 min
+28,360,In-Memory KDTree,15 min
+29,353,In-Memory KDTree,15 min
+30,409,In-Memory KDTree,15 min
+31,404,In-Memory KDTree,15 min
+32,381,In-Memory KDTree,15 min
+33,433,In-Memory KDTree,15 min
+34,354,In-Memory KDTree,15 min
+35,373,In-Memory KDTree,15 min
+36,372,In-Memory KDTree,15 min
+37,419,In-Memory KDTree,15 min
+38,410,In-Memory KDTree,15 min
+39,460,In-Memory KDTree,15 min
+40,523,In-Memory KDTree,15 min
+41,517,In-Memory KDTree,15 min
+42,398,In-Memory KDTree,15 min
+43,408,In-Memory KDTree,15 min
+44,391,In-Memory KDTree,15 min
+45,398,In-Memory KDTree,15 min
+46,464,In-Memory KDTree,15 min
+47,488,In-Memory KDTree,15 min
+48,427,In-Memory KDTree,15 min
+49,467,In-Memory KDTree,15 min
+50,394,In-Memory KDTree,15 min
+51,431,In-Memory KDTree,15 min
+52,372,In-Memory KDTree,15 min
+53,379,In-Memory KDTree,15 min
+54,416,In-Memory KDTree,15 min
+55,437,In-Memory KDTree,15 min
+56,467,In-Memory KDTree,15 min
+57,453,In-Memory KDTree,15 min
+58,422,In-Memory KDTree,15 min
+59,414,In-Memory KDTree,15 min
+60,398,In-Memory KDTree,15 min
+61,384,In-Memory KDTree,15 min
+62,465,In-Memory KDTree,15 min
+63,469,In-Memory KDTree,15 min
+0,140,In-memory AdaptiveBins,15 min
+1,352,In-memory AdaptiveBins,15 min
+2,321,In-memory AdaptiveBins,15 min
+3,692,In-memory AdaptiveBins,15 min
+4,591,In-memory AdaptiveBins,15 min
+5,393,In-memory AdaptiveBins,15 min
+6,222,In-memory AdaptiveBins,15 min
+7,200,In-memory AdaptiveBins,15 min
+8,322,In-memory AdaptiveBins,15 min
+9,459,In-memory AdaptiveBins,15 min
+10,606,In-memory AdaptiveBins,15 min
+11,143,In-memory AdaptiveBins,15 min
+12,384,In-memory AdaptiveBins,15 min
+13,242,In-memory AdaptiveBins,15 min
+14,409,In-memory AdaptiveBins,15 min
+15,516,In-memory AdaptiveBins,15 min
+16,154,In-memory AdaptiveBins,15 min
+17,382,In-memory AdaptiveBins,15 min
+18,360,In-memory AdaptiveBins,15 min
+19,786,In-memory AdaptiveBins,15 min
+20,627,In-memory AdaptiveBins,15 min
+21,436,In-memory AdaptiveBins,15 min
+22,231,In-memory AdaptiveBins,15 min
+23,214,In-memory AdaptiveBins,15 min
+24,343,In-memory AdaptiveBins,15 min
+25,478,In-memory AdaptiveBins,15 min
+26,660,In-memory AdaptiveBins,15 min
+27,149,In-memory AdaptiveBins,15 min
+28,444,In-memory AdaptiveBins,15 min
+29,259,In-memory AdaptiveBins,15 min
+30,441,In-memory AdaptiveBins,15 min
+31,532,In-memory AdaptiveBins,15 min
+32,157,In-memory AdaptiveBins,15 min
+33,390,In-memory AdaptiveBins,15 min
+34,392,In-memory AdaptiveBins,15 min
+35,836,In-memory AdaptiveBins,15 min
+36,649,In-memory AdaptiveBins,15 min
+37,449,In-memory AdaptiveBins,15 min
+38,248,In-memory AdaptiveBins,15 min
+39,212,In-memory AdaptiveBins,15 min
+40,354,In-memory AdaptiveBins,15 min
+41,479,In-memory AdaptiveBins,15 min
+42,672,In-memory AdaptiveBins,15 min
+43,154,In-memory AdaptiveBins,15 min
+44,453,In-memory AdaptiveBins,15 min
+45,263,In-memory AdaptiveBins,15 min
+46,453,In-memory AdaptiveBins,15 min
+47,543,In-memory AdaptiveBins,15 min
+48,152,In-memory AdaptiveBins,15 min
+49,382,In-memory AdaptiveBins,15 min
+50,394,In-memory AdaptiveBins,15 min
+51,853,In-memory AdaptiveBins,15 min
+52,664,In-memory AdaptiveBins,15 min
+53,461,In-memory AdaptiveBins,15 min
+54,263,In-memory AdaptiveBins,15 min
+55,212,In-memory AdaptiveBins,15 min
+56,351,In-memory AdaptiveBins,15 min
+57,479,In-memory AdaptiveBins,15 min
+58,662,In-memory AdaptiveBins,15 min
+59,148,In-memory AdaptiveBins,15 min
+60,460,In-memory AdaptiveBins,15 min
+61,269,In-memory AdaptiveBins,15 min
+62,437,In-memory AdaptiveBins,15 min
+63,539,In-memory AdaptiveBins,15 min
+0,26,Approximate Adaptive Bins,15 min
+1,455,Approximate Adaptive Bins,15 min
+2,58,Approximate Adaptive Bins,15 min
+3,746,Approximate Adaptive Bins,15 min
+4,372,Approximate Adaptive Bins,15 min
+5,549,Approximate Adaptive Bins,15 min
+6,42,Approximate Adaptive Bins,15 min
+7,170,Approximate Adaptive Bins,15 min
+8,372,Approximate Adaptive Bins,15 min
+9,933,Approximate Adaptive Bins,15 min
+10,592,Approximate Adaptive Bins,15 min
+11,274,Approximate Adaptive Bins,15 min
+12,337,Approximate Adaptive Bins,15 min
+13,288,Approximate Adaptive Bins,15 min
+14,176,Approximate Adaptive Bins,15 min
+15,598,Approximate Adaptive Bins,15 min
+16,26,Approximate Adaptive Bins,15 min
+17,503,Approximate Adaptive Bins,15 min
+18,75,Approximate Adaptive Bins,15 min
+19,843,Approximate Adaptive Bins,15 min
+20,404,Approximate Adaptive Bins,15 min
+21,588,Approximate Adaptive Bins,15 min
+22,40,Approximate Adaptive Bins,15 min
+23,188,Approximate Adaptive Bins,15 min
+24,397,Approximate Adaptive Bins,15 min
+25,962,Approximate Adaptive Bins,15 min
+26,647,Approximate Adaptive Bins,15 min
+27,288,Approximate Adaptive Bins,15 min
+28,380,Approximate Adaptive Bins,15 min
+29,307,Approximate Adaptive Bins,15 min
+30,193,Approximate Adaptive Bins,15 min
+31,618,Approximate Adaptive Bins,15 min
+32,29,Approximate Adaptive Bins,15 min
+33,529,Approximate Adaptive Bins,15 min
+34,80,Approximate Adaptive Bins,15 min
+35,904,Approximate Adaptive Bins,15 min
+36,424,Approximate Adaptive Bins,15 min
+37,599,Approximate Adaptive Bins,15 min
+38,46,Approximate Adaptive Bins,15 min
+39,194,Approximate Adaptive Bins,15 min
+40,402,Approximate Adaptive Bins,15 min
+41,986,Approximate Adaptive Bins,15 min
+42,650,Approximate Adaptive Bins,15 min
+43,299,Approximate Adaptive Bins,15 min
+44,380,Approximate Adaptive Bins,15 min
+45,311,Approximate Adaptive Bins,15 min
+46,194,Approximate Adaptive Bins,15 min
+47,622,Approximate Adaptive Bins,15 min
+48,27,Approximate Adaptive Bins,15 min
+49,522,Approximate Adaptive Bins,15 min
+50,77,Approximate Adaptive Bins,15 min
+51,917,Approximate Adaptive Bins,15 min
+52,432,Approximate Adaptive Bins,15 min
+53,609,Approximate Adaptive Bins,15 min
+54,45,Approximate Adaptive Bins,15 min
+55,196,Approximate Adaptive Bins,15 min
+56,420,Approximate Adaptive Bins,15 min
+57,1005,Approximate Adaptive Bins,15 min
+58,640,Approximate Adaptive Bins,15 min
+59,288,Approximate Adaptive Bins,15 min
+60,385,Approximate Adaptive Bins,15 min
+61,317,Approximate Adaptive Bins,15 min
+62,194,Approximate Adaptive Bins,15 min
+63,619,Approximate Adaptive Bins,15 min
+0,127,Adaptive Bins Spark,15 min
+1,327,Adaptive Bins Spark,15 min
+2,323,Adaptive Bins Spark,15 min
+3,692,Adaptive Bins Spark,15 min
+4,595,Adaptive Bins Spark,15 min
+5,398,Adaptive Bins Spark,15 min
+6,230,Adaptive Bins Spark,15 min
+7,201,Adaptive Bins Spark,15 min
+8,320,Adaptive Bins Spark,15 min
+9,460,Adaptive Bins Spark,15 min
+10,617,Adaptive Bins Spark,15 min
+11,142,Adaptive Bins Spark,15 min
+12,384,Adaptive Bins Spark,15 min
+13,233,Adaptive Bins Spark,15 min
+14,412,Adaptive Bins Spark,15 min
+15,502,Adaptive Bins Spark,15 min
+16,140,Adaptive Bins Spark,15 min
+17,356,Adaptive Bins Spark,15 min
+18,362,Adaptive Bins Spark,15 min
+19,789,Adaptive Bins Spark,15 min
+20,632,Adaptive Bins Spark,15 min
+21,442,Adaptive Bins Spark,15 min
+22,239,Adaptive Bins Spark,15 min
+23,218,Adaptive Bins Spark,15 min
+24,341,Adaptive Bins Spark,15 min
+25,480,Adaptive Bins Spark,15 min
+26,676,Adaptive Bins Spark,15 min
+27,149,Adaptive Bins Spark,15 min
+28,441,Adaptive Bins Spark,15 min
+29,253,Adaptive Bins Spark,15 min
+30,442,Adaptive Bins Spark,15 min
+31,517,Adaptive Bins Spark,15 min
+32,146,Adaptive Bins Spark,15 min
+33,371,Adaptive Bins Spark,15 min
+34,401,Adaptive Bins Spark,15 min
+35,843,Adaptive Bins Spark,15 min
+36,664,Adaptive Bins Spark,15 min
+37,460,Adaptive Bins Spark,15 min
+38,257,Adaptive Bins Spark,15 min
+39,215,Adaptive Bins Spark,15 min
+40,358,Adaptive Bins Spark,15 min
+41,482,Adaptive Bins Spark,15 min
+42,686,Adaptive Bins Spark,15 min
+43,156,Adaptive Bins Spark,15 min
+44,456,Adaptive Bins Spark,15 min
+45,258,Adaptive Bins Spark,15 min
+46,445,Adaptive Bins Spark,15 min
+47,534,Adaptive Bins Spark,15 min
+48,131,Adaptive Bins Spark,15 min
+49,358,Adaptive Bins Spark,15 min
+50,396,Adaptive Bins Spark,15 min
+51,853,Adaptive Bins Spark,15 min
+52,668,Adaptive Bins Spark,15 min
+53,462,Adaptive Bins Spark,15 min
+54,265,Adaptive Bins Spark,15 min
+55,213,Adaptive Bins Spark,15 min
+56,350,Adaptive Bins Spark,15 min
+57,479,Adaptive Bins Spark,15 min
+58,673,Adaptive Bins Spark,15 min
+59,151,Adaptive Bins Spark,15 min
+60,459,Adaptive Bins Spark,15 min
+61,262,Adaptive Bins Spark,15 min
+62,436,Adaptive Bins Spark,15 min
+63,535,Adaptive Bins Spark,15 min
+0,328,KDTree Spark,15 min
+1,345,KDTree Spark,15 min
+2,346,KDTree Spark,15 min
+3,352,KDTree Spark,15 min
+4,315,KDTree Spark,15 min
+5,349,KDTree Spark,15 min
+6,404,KDTree Spark,15 min
+7,445,KDTree Spark,15 min
+8,355,KDTree Spark,15 min
+9,357,KDTree Spark,15 min
+10,405,KDTree Spark,15 min
+11,410,KDTree Spark,15 min
+12,385,KDTree Spark,15 min
+13,391,KDTree Spark,15 min
+14,416,KDTree Spark,15 min
+15,430,KDTree Spark,15 min
+16,338,KDTree Spark,15 min
+17,356,KDTree Spark,15 min
+18,372,KDTree Spark,15 min
+19,431,KDTree Spark,15 min
+20,360,KDTree Spark,15 min
+21,382,KDTree Spark,15 min
+22,363,KDTree Spark,15 min
+23,414,KDTree Spark,15 min
+24,394,KDTree Spark,15 min
+25,397,KDTree Spark,15 min
+26,413,KDTree Spark,15 min
+27,423,KDTree Spark,15 min
+28,370,KDTree Spark,15 min
+29,370,KDTree Spark,15 min
+30,432,KDTree Spark,15 min
+31,436,KDTree Spark,15 min
+32,341,KDTree Spark,15 min
+33,400,KDTree Spark,15 min
+34,374,KDTree Spark,15 min
+35,400,KDTree Spark,15 min
+36,370,KDTree Spark,15 min
+37,421,KDTree Spark,15 min
+38,436,KDTree Spark,15 min
+39,503,KDTree Spark,15 min
+40,422,KDTree Spark,15 min
+41,429,KDTree Spark,15 min
+42,388,KDTree Spark,15 min
+43,402,KDTree Spark,15 min
+44,406,KDTree Spark,15 min
+45,415,KDTree Spark,15 min
+46,594,KDTree Spark,15 min
+47,616,KDTree Spark,15 min
+48,385,KDTree Spark,15 min
+49,425,KDTree Spark,15 min
+50,408,KDTree Spark,15 min
+51,455,KDTree Spark,15 min
+52,344,KDTree Spark,15 min
+53,354,KDTree Spark,15 min
+54,447,KDTree Spark,15 min
+55,480,KDTree Spark,15 min
+56,432,KDTree Spark,15 min
+57,434,KDTree Spark,15 min
+58,419,KDTree Spark,15 min
+59,436,KDTree Spark,15 min
+60,390,KDTree Spark,15 min
+61,386,KDTree Spark,15 min
+62,499,KDTree Spark,15 min
+63,500,KDTree Spark,15 min
+0,4029,Bisective K-Means,15 min
+1,4351,Bisective K-Means,15 min
+2,846,Bisective K-Means,15 min
+3,883,Bisective K-Means,15 min
+4,4656,Bisective K-Means,15 min
+5,4668,Bisective K-Means,15 min
+6,4493,Bisective K-Means,15 min
+7,933,Bisective K-Means,15 min
+8,419,Bisective K-Means,15 min
+9,209,Bisective K-Means,15 min
+10,492,Bisective K-Means,15 min
+11,236,Bisective K-Means,15 min
+12,110,Bisective K-Means,15 min
+13,319,Bisective K-Means,15 min
+14,339,Bisective K-Means,15 min
+15,349,Bisective K-Means,15 min
+0,10,RegularGrid,6 hrs
+1,14,RegularGrid,6 hrs
+2,12,RegularGrid,6 hrs
+3,8,RegularGrid,6 hrs
+4,11,RegularGrid,6 hrs
+5,17,RegularGrid,6 hrs
+6,15,RegularGrid,6 hrs
+7,7,RegularGrid,6 hrs
+8,3239,RegularGrid,6 hrs
+9,2958,RegularGrid,6 hrs
+10,2234,RegularGrid,6 hrs
+11,1455,RegularGrid,6 hrs
+12,1633,RegularGrid,6 hrs
+13,1478,RegularGrid,6 hrs
+14,1115,RegularGrid,6 hrs
+15,721,RegularGrid,6 hrs
+16,209,RegularGrid,6 hrs
+17,192,RegularGrid,6 hrs
+18,85,RegularGrid,6 hrs
+19,29,RegularGrid,6 hrs
+20,215,RegularGrid,6 hrs
+21,280,RegularGrid,6 hrs
+22,242,RegularGrid,6 hrs
+23,153,RegularGrid,6 hrs
+24,3078,RegularGrid,6 hrs
+25,2536,RegularGrid,6 hrs
+26,1660,RegularGrid,6 hrs
+27,1008,RegularGrid,6 hrs
+28,1863,RegularGrid,6 hrs
+29,1751,RegularGrid,6 hrs
+30,1354,RegularGrid,6 hrs
+31,1197,RegularGrid,6 hrs
+32,3,RegularGrid,6 hrs
+33,9,RegularGrid,6 hrs
+34,14,RegularGrid,6 hrs
+35,40,RegularGrid,6 hrs
+36,36,RegularGrid,6 hrs
+37,64,RegularGrid,6 hrs
+38,64,RegularGrid,6 hrs
+39,47,RegularGrid,6 hrs
+40,1080,RegularGrid,6 hrs
+41,1421,RegularGrid,6 hrs
+42,1562,RegularGrid,6 hrs
+43,1673,RegularGrid,6 hrs
+44,983,RegularGrid,6 hrs
+45,1237,RegularGrid,6 hrs
+46,1933,RegularGrid,6 hrs
+47,3264,RegularGrid,6 hrs
+48,743,RegularGrid,6 hrs
+49,873,RegularGrid,6 hrs
+50,832,RegularGrid,6 hrs
+51,713,RegularGrid,6 hrs
+52,182,RegularGrid,6 hrs
+53,258,RegularGrid,6 hrs
+54,257,RegularGrid,6 hrs
+55,221,RegularGrid,6 hrs
+56,991,RegularGrid,6 hrs
+57,1234,RegularGrid,6 hrs
+58,1203,RegularGrid,6 hrs
+59,1088,RegularGrid,6 hrs
+60,86,RegularGrid,6 hrs
+61,96,RegularGrid,6 hrs
+62,85,RegularGrid,6 hrs
+63,86,RegularGrid,6 hrs
+0,1099,In-Memory KDTree,6 hrs
+1,1223,In-Memory KDTree,6 hrs
+2,1068,In-Memory KDTree,6 hrs
+3,1086,In-Memory KDTree,6 hrs
+4,1211,In-Memory KDTree,6 hrs
+5,1275,In-Memory KDTree,6 hrs
+6,1053,In-Memory KDTree,6 hrs
+7,1017,In-Memory KDTree,6 hrs
+8,914,In-Memory KDTree,6 hrs
+9,778,In-Memory KDTree,6 hrs
+10,899,In-Memory KDTree,6 hrs
+11,801,In-Memory KDTree,6 hrs
+12,1238,In-Memory KDTree,6 hrs
+13,966,In-Memory KDTree,6 hrs
+14,1049,In-Memory KDTree,6 hrs
+15,829,In-Memory KDTree,6 hrs
+16,1076,In-Memory KDTree,6 hrs
+17,1059,In-Memory KDTree,6 hrs
+18,1002,In-Memory KDTree,6 hrs
+19,1123,In-Memory KDTree,6 hrs
+20,1049,In-Memory KDTree,6 hrs
+21,1026,In-Memory KDTree,6 hrs
+22,995,In-Memory KDTree,6 hrs
+23,1014,In-Memory KDTree,6 hrs
+24,956,In-Memory KDTree,6 hrs
+25,833,In-Memory KDTree,6 hrs
+26,933,In-Memory KDTree,6 hrs
+27,739,In-Memory KDTree,6 hrs
+28,999,In-Memory KDTree,6 hrs
+29,780,In-Memory KDTree,6 hrs
+30,931,In-Memory KDTree,6 hrs
+31,718,In-Memory KDTree,6 hrs
+32,1164,In-Memory KDTree,6 hrs
+33,1424,In-Memory KDTree,6 hrs
+34,1269,In-Memory KDTree,6 hrs
+35,1357,In-Memory KDTree,6 hrs
+36,796,In-Memory KDTree,6 hrs
+37,984,In-Memory KDTree,6 hrs
+38,939,In-Memory KDTree,6 hrs
+39,1119,In-Memory KDTree,6 hrs
+40,1468,In-Memory KDTree,6 hrs
+41,1187,In-Memory KDTree,6 hrs
+42,1208,In-Memory KDTree,6 hrs
+43,1183,In-Memory KDTree,6 hrs
+44,993,In-Memory KDTree,6 hrs
+45,817,In-Memory KDTree,6 hrs
+46,1070,In-Memory KDTree,6 hrs
+47,925,In-Memory KDTree,6 hrs
+48,1085,In-Memory KDTree,6 hrs
+49,1036,In-Memory KDTree,6 hrs
+50,854,In-Memory KDTree,6 hrs
+51,1069,In-Memory KDTree,6 hrs
+52,701,In-Memory KDTree,6 hrs
+53,793,In-Memory KDTree,6 hrs
+54,652,In-Memory KDTree,6 hrs
+55,836,In-Memory KDTree,6 hrs
+56,1162,In-Memory KDTree,6 hrs
+57,1170,In-Memory KDTree,6 hrs
+58,1137,In-Memory KDTree,6 hrs
+59,1251,In-Memory KDTree,6 hrs
+60,960,In-Memory KDTree,6 hrs
+61,962,In-Memory KDTree,6 hrs
+62,1015,In-Memory KDTree,6 hrs
+63,1075,In-Memory KDTree,6 hrs
+0,662,In-memory AdaptiveBins,6 hrs
+1,1358,In-memory AdaptiveBins,6 hrs
+2,472,In-memory AdaptiveBins,6 hrs
+3,2224,In-memory AdaptiveBins,6 hrs
+4,1744,In-memory AdaptiveBins,6 hrs
+5,1684,In-memory AdaptiveBins,6 hrs
+6,318,In-memory AdaptiveBins,6 hrs
+7,599,In-memory AdaptiveBins,6 hrs
+8,1078,In-memory AdaptiveBins,6 hrs
+9,1980,In-memory AdaptiveBins,6 hrs
+10,1378,In-memory AdaptiveBins,6 hrs
+11,319,In-memory AdaptiveBins,6 hrs
+12,1008,In-memory AdaptiveBins,6 hrs
+13,443,In-memory AdaptiveBins,6 hrs
+14,1059,In-memory AdaptiveBins,6 hrs
+15,287,In-memory AdaptiveBins,6 hrs
+16,618,In-memory AdaptiveBins,6 hrs
+17,1149,In-memory AdaptiveBins,6 hrs
+18,472,In-memory AdaptiveBins,6 hrs
+19,2899,In-memory AdaptiveBins,6 hrs
+20,1676,In-memory AdaptiveBins,6 hrs
+21,1464,In-memory AdaptiveBins,6 hrs
+22,278,In-memory AdaptiveBins,6 hrs
+23,695,In-memory AdaptiveBins,6 hrs
+24,969,In-memory AdaptiveBins,6 hrs
+25,1651,In-memory AdaptiveBins,6 hrs
+26,1223,In-memory AdaptiveBins,6 hrs
+27,468,In-memory AdaptiveBins,6 hrs
+28,975,In-memory AdaptiveBins,6 hrs
+29,393,In-memory AdaptiveBins,6 hrs
+30,1252,In-memory AdaptiveBins,6 hrs
+31,421,In-memory AdaptiveBins,6 hrs
+32,425,In-memory AdaptiveBins,6 hrs
+33,724,In-memory AdaptiveBins,6 hrs
+34,331,In-memory AdaptiveBins,6 hrs
+35,2933,In-memory AdaptiveBins,6 hrs
+36,1305,In-memory AdaptiveBins,6 hrs
+37,903,In-memory AdaptiveBins,6 hrs
+38,268,In-memory AdaptiveBins,6 hrs
+39,700,In-memory AdaptiveBins,6 hrs
+40,762,In-memory AdaptiveBins,6 hrs
+41,1050,In-memory AdaptiveBins,6 hrs
+42,1051,In-memory AdaptiveBins,6 hrs
+43,519,In-memory AdaptiveBins,6 hrs
+44,777,In-memory AdaptiveBins,6 hrs
+45,263,In-memory AdaptiveBins,6 hrs
+46,1842,In-memory AdaptiveBins,6 hrs
+47,494,In-memory AdaptiveBins,6 hrs
+48,316,In-memory AdaptiveBins,6 hrs
+49,365,In-memory AdaptiveBins,6 hrs
+50,226,In-memory AdaptiveBins,6 hrs
+51,2518,In-memory AdaptiveBins,6 hrs
+52,901,In-memory AdaptiveBins,6 hrs
+53,390,In-memory AdaptiveBins,6 hrs
+54,396,In-memory AdaptiveBins,6 hrs
+55,685,In-memory AdaptiveBins,6 hrs
+56,505,In-memory AdaptiveBins,6 hrs
+57,467,In-memory AdaptiveBins,6 hrs
+58,1373,In-memory AdaptiveBins,6 hrs
+59,512,In-memory AdaptiveBins,6 hrs
+60,526,In-memory AdaptiveBins,6 hrs
+61,141,In-memory AdaptiveBins,6 hrs
+62,3036,In-memory AdaptiveBins,6 hrs
+63,440,In-memory AdaptiveBins,6 hrs
+0,354,Approximate Adaptive Bins,6 hrs
+1,1534,Approximate Adaptive Bins,6 hrs
+2,525,Approximate Adaptive Bins,6 hrs
+3,2223,Approximate Adaptive Bins,6 hrs
+4,1482,Approximate Adaptive Bins,6 hrs
+5,1757,Approximate Adaptive Bins,6 hrs
+6,407,Approximate Adaptive Bins,6 hrs
+7,640,Approximate Adaptive Bins,6 hrs
+8,1026,Approximate Adaptive Bins,6 hrs
+9,1813,Approximate Adaptive Bins,6 hrs
+10,1446,Approximate Adaptive Bins,6 hrs
+11,418,Approximate Adaptive Bins,6 hrs
+12,1008,Approximate Adaptive Bins,6 hrs
+13,570,Approximate Adaptive Bins,6 hrs
+14,972,Approximate Adaptive Bins,6 hrs
+15,490,Approximate Adaptive Bins,6 hrs
+16,338,Approximate Adaptive Bins,6 hrs
+17,1257,Approximate Adaptive Bins,6 hrs
+18,532,Approximate Adaptive Bins,6 hrs
+19,2897,Approximate Adaptive Bins,6 hrs
+20,1426,Approximate Adaptive Bins,6 hrs
+21,1528,Approximate Adaptive Bins,6 hrs
+22,348,Approximate Adaptive Bins,6 hrs
+23,728,Approximate Adaptive Bins,6 hrs
+24,929,Approximate Adaptive Bins,6 hrs
+25,1463,Approximate Adaptive Bins,6 hrs
+26,1243,Approximate Adaptive Bins,6 hrs
+27,561,Approximate Adaptive Bins,6 hrs
+28,965,Approximate Adaptive Bins,6 hrs
+29,496,Approximate Adaptive Bins,6 hrs
+30,1071,Approximate Adaptive Bins,6 hrs
+31,663,Approximate Adaptive Bins,6 hrs
+32,250,Approximate Adaptive Bins,6 hrs
+33,797,Approximate Adaptive Bins,6 hrs
+34,364,Approximate Adaptive Bins,6 hrs
+35,2937,Approximate Adaptive Bins,6 hrs
+36,1147,Approximate Adaptive Bins,6 hrs
+37,965,Approximate Adaptive Bins,6 hrs
+38,239,Approximate Adaptive Bins,6 hrs
+39,758,Approximate Adaptive Bins,6 hrs
+40,733,Approximate Adaptive Bins,6 hrs
+41,947,Approximate Adaptive Bins,6 hrs
+42,963,Approximate Adaptive Bins,6 hrs
+43,659,Approximate Adaptive Bins,6 hrs
+44,776,Approximate Adaptive Bins,6 hrs
+45,339,Approximate Adaptive Bins,6 hrs
+46,1581,Approximate Adaptive Bins,6 hrs
+47,899,Approximate Adaptive Bins,6 hrs
+48,199,Approximate Adaptive Bins,6 hrs
+49,433,Approximate Adaptive Bins,6 hrs
+50,234,Approximate Adaptive Bins,6 hrs
+51,2523,Approximate Adaptive Bins,6 hrs
+52,842,Approximate Adaptive Bins,6 hrs
+53,418,Approximate Adaptive Bins,6 hrs
+54,274,Approximate Adaptive Bins,6 hrs
+55,749,Approximate Adaptive Bins,6 hrs
+56,499,Approximate Adaptive Bins,6 hrs
+57,431,Approximate Adaptive Bins,6 hrs
+58,1113,Approximate Adaptive Bins,6 hrs
+59,752,Approximate Adaptive Bins,6 hrs
+60,525,Approximate Adaptive Bins,6 hrs
+61,187,Approximate Adaptive Bins,6 hrs
+62,2773,Approximate Adaptive Bins,6 hrs
+63,1035,Approximate Adaptive Bins,6 hrs
+0,448,Adaptive Bins Spark,6 hrs
+1,1204,Adaptive Bins Spark,6 hrs
+2,432,Adaptive Bins Spark,6 hrs
+3,2041,Adaptive Bins Spark,6 hrs
+4,1523,Adaptive Bins Spark,6 hrs
+5,1659,Adaptive Bins Spark,6 hrs
+6,309,Adaptive Bins Spark,6 hrs
+7,554,Adaptive Bins Spark,6 hrs
+8,996,Adaptive Bins Spark,6 hrs
+9,1822,Adaptive Bins Spark,6 hrs
+10,1320,Adaptive Bins Spark,6 hrs
+11,274,Adaptive Bins Spark,6 hrs
+12,947,Adaptive Bins Spark,6 hrs
+13,430,Adaptive Bins Spark,6 hrs
+14,1020,Adaptive Bins Spark,6 hrs
+15,261,Adaptive Bins Spark,6 hrs
+16,443,Adaptive Bins Spark,6 hrs
+17,1091,Adaptive Bins Spark,6 hrs
+18,479,Adaptive Bins Spark,6 hrs
+19,2826,Adaptive Bins Spark,6 hrs
+20,1546,Adaptive Bins Spark,6 hrs
+21,1580,Adaptive Bins Spark,6 hrs
+22,304,Adaptive Bins Spark,6 hrs
+23,691,Adaptive Bins Spark,6 hrs
+24,973,Adaptive Bins Spark,6 hrs
+25,1673,Adaptive Bins Spark,6 hrs
+26,1223,Adaptive Bins Spark,6 hrs
+27,445,Adaptive Bins Spark,6 hrs
+28,985,Adaptive Bins Spark,6 hrs
+29,413,Adaptive Bins Spark,6 hrs
+30,1194,Adaptive Bins Spark,6 hrs
+31,399,Adaptive Bins Spark,6 hrs
+32,360,Adaptive Bins Spark,6 hrs
+33,781,Adaptive Bins Spark,6 hrs
+34,391,Adaptive Bins Spark,6 hrs
+35,3027,Adaptive Bins Spark,6 hrs
+36,1383,Adaptive Bins Spark,6 hrs
+37,1149,Adaptive Bins Spark,6 hrs
+38,292,Adaptive Bins Spark,6 hrs
+39,721,Adaptive Bins Spark,6 hrs
+40,834,Adaptive Bins Spark,6 hrs
+41,1225,Adaptive Bins Spark,6 hrs
+42,1154,Adaptive Bins Spark,6 hrs
+43,540,Adaptive Bins Spark,6 hrs
+44,879,Adaptive Bins Spark,6 hrs
+45,323,Adaptive Bins Spark,6 hrs
+46,1812,Adaptive Bins Spark,6 hrs
+47,507,Adaptive Bins Spark,6 hrs
+48,248,Adaptive Bins Spark,6 hrs
+49,396,Adaptive Bins Spark,6 hrs
+50,238,Adaptive Bins Spark,6 hrs
+51,2611,Adaptive Bins Spark,6 hrs
+52,939,Adaptive Bins Spark,6 hrs
+53,471,Adaptive Bins Spark,6 hrs
+54,401,Adaptive Bins Spark,6 hrs
+55,699,Adaptive Bins Spark,6 hrs
+56,552,Adaptive Bins Spark,6 hrs
+57,520,Adaptive Bins Spark,6 hrs
+58,1422,Adaptive Bins Spark,6 hrs
+59,531,Adaptive Bins Spark,6 hrs
+60,572,Adaptive Bins Spark,6 hrs
+61,163,Adaptive Bins Spark,6 hrs
+62,3101,Adaptive Bins Spark,6 hrs
+63,461,Adaptive Bins Spark,6 hrs
+0,1104,KDTree Spark,6 hrs
+1,1257,KDTree Spark,6 hrs
+2,1082,KDTree Spark,6 hrs
+3,1095,KDTree Spark,6 hrs
+4,1186,KDTree Spark,6 hrs
+5,1263,KDTree Spark,6 hrs
+6,1031,KDTree Spark,6 hrs
+7,1004,KDTree Spark,6 hrs
+8,913,KDTree Spark,6 hrs
+9,797,KDTree Spark,6 hrs
+10,902,KDTree Spark,6 hrs
+11,823,KDTree Spark,6 hrs
+12,1214,KDTree Spark,6 hrs
+13,971,KDTree Spark,6 hrs
+14,1050,KDTree Spark,6 hrs
+15,827,KDTree Spark,6 hrs
+16,1047,KDTree Spark,6 hrs
+17,1080,KDTree Spark,6 hrs
+18,1002,KDTree Spark,6 hrs
+19,1147,KDTree Spark,6 hrs
+20,1033,KDTree Spark,6 hrs
+21,1006,KDTree Spark,6 hrs
+22,975,KDTree Spark,6 hrs
+23,1012,KDTree Spark,6 hrs
+24,945,KDTree Spark,6 hrs
+25,845,KDTree Spark,6 hrs
+26,925,KDTree Spark,6 hrs
+27,707,KDTree Spark,6 hrs
+28,971,KDTree Spark,6 hrs
+29,808,KDTree Spark,6 hrs
+30,907,KDTree Spark,6 hrs
+31,720,KDTree Spark,6 hrs
+32,1127,KDTree Spark,6 hrs
+33,1373,KDTree Spark,6 hrs
+34,1199,KDTree Spark,6 hrs
+35,1247,KDTree Spark,6 hrs
+36,805,KDTree Spark,6 hrs
+37,985,KDTree Spark,6 hrs
+38,1022,KDTree Spark,6 hrs
+39,1222,KDTree Spark,6 hrs
+40,1451,KDTree Spark,6 hrs
+41,1215,KDTree Spark,6 hrs
+42,1202,KDTree Spark,6 hrs
+43,1177,KDTree Spark,6 hrs
+44,1099,KDTree Spark,6 hrs
+45,893,KDTree Spark,6 hrs
+46,1039,KDTree Spark,6 hrs
+47,910,KDTree Spark,6 hrs
+48,1068,KDTree Spark,6 hrs
+49,1020,KDTree Spark,6 hrs
+50,833,KDTree Spark,6 hrs
+51,1031,KDTree Spark,6 hrs
+52,706,KDTree Spark,6 hrs
+53,825,KDTree Spark,6 hrs
+54,702,KDTree Spark,6 hrs
+55,907,KDTree Spark,6 hrs
+56,1143,KDTree Spark,6 hrs
+57,1161,KDTree Spark,6 hrs
+58,1127,KDTree Spark,6 hrs
+59,1280,KDTree Spark,6 hrs
+60,973,KDTree Spark,6 hrs
+61,961,KDTree Spark,6 hrs
+62,1021,KDTree Spark,6 hrs
+63,1097,KDTree Spark,6 hrs
+0,8343,Bisective K-Means,6 hrs
+1,7482,Bisective K-Means,6 hrs
+2,1909,Bisective K-Means,6 hrs
+3,1726,Bisective K-Means,6 hrs
+4,6459,Bisective K-Means,6 hrs
+5,2545,Bisective K-Means,6 hrs
+6,5587,Bisective K-Means,6 hrs
+7,2650,Bisective K-Means,6 hrs
+8,986,Bisective K-Means,6 hrs
+9,1462,Bisective K-Means,6 hrs
+10,708,Bisective K-Means,6 hrs
+11,963,Bisective K-Means,6 hrs
+12,3124,Bisective K-Means,6 hrs
+13,8812,Bisective K-Means,6 hrs
+14,9838,Bisective K-Means,6 hrs
+15,5555,Bisective K-Means,6 hrs
